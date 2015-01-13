@@ -63,11 +63,10 @@ struct StringType : Type<T> {
   }
 
   static Try<T> from_json(const Json& json) {
+    if (json.type() != Json::value_type::string) {
+      return Failure<T>("StringType must be intialized from JSON string type");
+    }
     return Success(T(json.get<std::string>()));
-  }
-
-  static Try<T> from_json(const std::nullptr_t null) {
-    return Failure<T>("Expected JSON string type");
   }
 
   static Json to_json(const T& string_type) {

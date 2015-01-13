@@ -37,11 +37,16 @@ TEST(StringType, different_values_dont) {
   ASSERT_NE(SomeStringType("x string"), SomeStringType("y string"));
 }
 
-TEST(StringType, from_json) {
+TEST(StringType, from_json_string) {
   const Json json = "A String";
   Try<SomeStringType> a_try = SomeStringType::from_json(json);
   ASSERT_TRUE(a_try);
   ASSERT_EQ(SomeStringType("A String"), from_success(a_try));
+}
+
+TEST(StringType, not_from_other_json) {
+  ASSERT_FALSE(SomeStringType::from_json(Json{nullptr}));
+  ASSERT_FALSE(SomeStringType::from_json(Json{42}));
 }
 
 TEST(StringType, to_json) {

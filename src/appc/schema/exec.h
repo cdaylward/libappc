@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "appc/schema/common.h"
@@ -17,6 +16,7 @@ struct ExecArg : StringType<ExecArg> {
     return Valid();
   }
 };
+
 
 struct Exec : ArrayType<Exec, ExecArg> {
   explicit Exec(const std::vector<ExecArg>& args)

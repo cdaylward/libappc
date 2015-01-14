@@ -6,59 +6,39 @@
 template<typename T>
 class Try {
   private:
-  const bool success;
-  const T* result;
+  const std::shared_ptr<T> result;
   const std::string reason;
 
   public:
-  explicit Try<T>(const bool success,
-                  const T* result,
+  explicit Try<T>(const std::shared_ptr<T>& result,
                   const std::string& reason)
-    : success(success),
-      result(result),
+    : result(result),
       reason(reason) {}
 
-  explicit Try<T>(const bool success,
-                  std::nullptr_t null,
+  explicit Try<T>(std::nullptr_t null,
                   const std::string& reason)
-    : success(success),
-      reason(reason) {}
-
-  ~Try() {
-    delete result;
-  }
-
-  Try<T>(const Try<T>& other)
-  : success(other.success),
-    result(other.result),
-    reason(other.reason)
-  {}
-
-  Try<T>(const Try<T>&& other)
-  : success(std::move(other.success)),
-    result(std::move(other.result)),
-    reason(std::move(other.reason))
-  {}
+    : reason(reason) {}
 
   operator bool() const {
-    return success;
+    return successful();
   }
 
-  bool successful() {
-    return success;
+  bool successful() const {
+    return static_cast<bool>(result);
   }
 
-  bool failure() {
-    return !success;
+  bool failure() const {
+    return !successful();
   }
 
-  const std::string& failureReason() {
+  const std::string& failure_reason() const {
     return reason;
   }
 
-  T operator()() const {
-    return *result;
+  operator std::shared_ptr<T>() const {
+    return std::shared_ptr<T>(result);
   }
+
   T& operator*() const {
     return *result;
   }
@@ -68,16 +48,16 @@ class Try {
 };
 
 template<typename T>
-Try<T> Success(const T& value) {
-  return Try<T>(true, new T(value), "");
+Try<T> Result(const T& value) {
+  return Try<T>(std::make_shared<T>(value), "");
 }
 
 template<typename T>
 Try<T> Failure(const std::string& reason) {
-  return Try<T>(false, nullptr, reason);
+  return Try<T>(nullptr, reason);
 }
 
-template<typename T>
-T from_success(const Try<T>& success) {
-  return success();
-}
+//template<typename T>
+//std::shared_ptr<T> from_success(const Try<T>& success) {
+//  return std::make_shared<T>(*success);
+//}

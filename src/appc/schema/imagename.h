@@ -6,6 +6,7 @@
 namespace appc {
 namespace schema {
 
+
 struct ImageName : StringType<ImageName> {
   explicit ImageName(const std::string& name)
   : StringType<ImageName>(name) {}

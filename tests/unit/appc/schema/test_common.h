@@ -1,3 +1,5 @@
+#pragma once
+
 #include "gtest/gtest.h"
 
 #include "appc/schema/common.h"
@@ -19,7 +21,7 @@ TEST(Status, invalid_is_false) {
 struct SomeStringType : StringType<SomeStringType> {
   explicit SomeStringType(const std::string& val)
   : StringType<SomeStringType>(val) {}
-  Status validate() {
+  Status validate() const {
     return Valid();
   }
 };
@@ -41,16 +43,29 @@ TEST(StringType, from_json_string) {
   const Json json = "A String";
   Try<SomeStringType> a_try = SomeStringType::from_json(json);
   ASSERT_TRUE(a_try);
-  ASSERT_EQ(SomeStringType("A String"), from_success(a_try));
+  ASSERT_EQ(SomeStringType("A String"), *a_try);
 }
 
 TEST(StringType, not_from_other_json) {
-  ASSERT_FALSE(SomeStringType::from_json(Json{nullptr}));
+  ASSERT_FALSE(SomeStringType::from_json(Json{}));
   ASSERT_FALSE(SomeStringType::from_json(Json{42}));
+  std::shared_ptr<SomeStringType> ptr = SomeStringType::from_json(Json{42});
+  ASSERT_FALSE(ptr);
 }
 
 TEST(StringType, to_json) {
-  const Json expected_json { "A String" };
+  const Json expected_json = "A String";
   const Json json = SomeStringType::to_json(SomeStringType("A String"));
+  ASSERT_EQ(Json::value_type::string, json.type());
   ASSERT_EQ(expected_json, json);
 }
+
+TEST(StringType, marshal_to_unmarshal) {
+  const Json expected_json = "A String";
+  const Try<SomeStringType> a_try = SomeStringType::from_json(expected_json);
+  ASSERT_TRUE(a_try);
+  const Json json = SomeStringType::to_json(*a_try);
+  ASSERT_EQ(Json::value_type::string, json.type());
+  ASSERT_EQ(expected_json, json);
+}
+

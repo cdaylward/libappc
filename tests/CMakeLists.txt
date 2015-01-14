@@ -3,7 +3,7 @@ enable_testing()
 
 include_directories(${GTEST_INCLUDE_DIRS})
 
-add_executable(test-schema unit/appc/schema/test_common.cpp)
+add_executable(test-schema ${CMAKE_SOURCE_DIR}/tests/unit/appc/schema/test.cpp)
 target_link_libraries(test-schema gtest gtest_main)
 add_test(test-schema
   COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test-schema

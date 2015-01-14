@@ -1,8 +1,8 @@
 #pragma once
 
-#include "appc/util/Try.h"
-
 #include "3rdparty/nlohmann/json.h"
+
+#include "appc/util/try.h"
 
 
 namespace appc {
@@ -39,7 +39,7 @@ Status Invalid(const std::string& message) {
 template<typename T>
 struct Type {
   virtual ~Type() = default;
-  virtual Status validate() = 0;
+  virtual Status validate() const = 0;
 };
 
 
@@ -47,7 +47,7 @@ template<typename T>
 struct StringType : Type<T> {
   const std::string value;
 
-  explicit StringType<T>(const std::string value)
+  explicit StringType<T>(const std::string& value)
   : value(value) {}
 
   bool operator==(const StringType<T>& other) const {
@@ -64,13 +64,13 @@ struct StringType : Type<T> {
 
   static Try<T> from_json(const Json& json) {
     if (json.type() != Json::value_type::string) {
-      return Failure<T>("StringType must be intialized from JSON string type");
+      return Failure<T>("StringType must be intialized from JSON string type.");
     }
-    return Success(T(json.get<std::string>()));
+    return Result(T(json.get<std::string>()));
   }
 
   static Json to_json(const T& string_type) {
-    return Json { string_type.value };
+    return string_type.value;
   }
 };
 

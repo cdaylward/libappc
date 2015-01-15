@@ -4,6 +4,10 @@
 
 A C++ library for doing things with [App Containers](https://github.com/appc/spec). The goal of the libary is to be a flexible toolkit: manifest parsing and creation, pluggable discovery, image creation/extraction/caching, thin-provisioned file systems, etc. Configuration and data interchange will almost always be JSON. Some or all pieces may be used in varying implementations.
 
+## Status
+
+Early, early development.
+
 ## Examples
 
 TODO

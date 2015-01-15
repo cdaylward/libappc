@@ -6,4 +6,29 @@ libappc is licensed under the [Apache License, Version 2.0](https://github.com/c
 
 ## Getting Started
 
-Feel free to plow in.
+* Fork the repository on GitHub.
+* Expriment wildly.
+* File bugs, submit pull requests for patches (many smaller commits are prefered to fix-all-the-things forklift patches).
+
+## Commit Messages
+
+Please use the following format. Messages should be in present tense.
+
+```
+<subsystem>: <synopsis of modification>
+<BLANK LINE>
+<rationale for this change, additional details,
+ this may be omitted if change is trivial>
+<BLANK LINE>
+<list of issues fixed, if any>
+```
+
+e.g.
+
+```
+examples: Fix exit status of parser when validation fails.
+
+Exit non-zero when validation of manifests fails.
+
+Fixes #22
+```

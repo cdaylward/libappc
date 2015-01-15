@@ -1,39 +1,36 @@
 #pragma once
 
-#include "appc/schema/common.h"
+#include "appc/schema/app_name.h"
+#include "appc/schema/image_id.h"
+#include "appc/schema/image_name.h"
+#include "appc/schema/labels.h"
 
 
 namespace appc {
 namespace schema {
 
 
-struct Dependency : Type<Dependency> {
-  //const AppName appName;
-  //const ImageID imageID;
-  //const Labels labels;
-  //const Root root;
-  //explicit Dependency(const AppName& appName,
-  //                    const ImageID& imageID,
-  //                    const Labels& labels,
-  //                    const Root& root)
-  //: appName(appName),
-  //  imageID(imageID),
-  //  labels(labels),
-  //  root(root) {}
 
-  //static Try<Dependency> from_json(const picojson::value json) {
-  //  picojson::value::object dep { json.get<picojson::value::object>() };
-  //  const Try<AppName> appName { AppName::from_json(dep["app"]) };
-  //  const Try<ImageID> imageID { ImageID::from_json(dep["imageID"]) };
-  //  const Try<Labels> labels { Labels::from_json(dep["labels"]) };
-  //  const Try<Root> root { Root::from_json(dep["root"]) };
-  //  return Success(Dependency(appName(),
-  //                            imageID(),
-  //                            labels(),
-  //                            root()));
-  //}
+struct Dependency : Type<Dependency> {
+  const AppName app_name;
+  const ImageID image_id;
+  const Labels labels;
+
+  explicit Dependency(const AppName& app_name,
+                      const ImageID& image_id,
+                      const Labels& labels)
+  : app_name(app_name),
+    image_id(image_id),
+    labels(labels) {}
+
   static Try<Dependency> from_json(const Json& json) {
-    return Result(Dependency());
+    // TODO check these
+    const Try<AppName> app_name = AppName::from_json(json[std::string{"app"}]);
+    const Try<ImageID> image_id = ImageID::from_json(json[std::string{"imageID"}]);
+    const Try<Labels> labels = Labels::from_json(json[std::string{"labels"}]);
+    return Result(Dependency(*app_name,
+                             *image_id,
+                             *labels));
   }
 
   Status validate() const {

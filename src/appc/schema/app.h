@@ -17,26 +17,26 @@ struct App : Type<App> {
   const Exec exec;
   const User user;
   const Group group;
-  const EventHandlers eventHandlers;
+  const EventHandlers event_handlers;
   //const Environment env;
-  const MountPoints mountPoints;
+  const MountPoints mount_points;
   //const Ports ports;
   const Isolators isolators;
 
   explicit App(const Exec& exec,
                const User& user,
                const Group& group,
-               const EventHandlers& eventHandlers,
+               const EventHandlers& event_handlers,
                //const Environment& env,
-               const MountPoints& mountPoints,
+               const MountPoints& mount_points,
                //const Ports& ports,
                const Isolators& isolators)
     : exec(exec),
       user(user),
       group(group),
-      eventHandlers(eventHandlers),
+      event_handlers(event_handlers),
       //env(env),
-      mountPoints(mountPoints),
+      mount_points(mount_points),
       //ports(ports),
       isolators(isolators) {}
 
@@ -47,16 +47,16 @@ struct App : Type<App> {
     const Try<Exec> exec = Exec::from_json(json[std::string{"exec"}]);
     const Try<User> user = User::from_json(json[std::string{"user"}]);
     const Try<Group> group = Group::from_json(json[std::string{"group"}]);
-    const Try<EventHandlers> eventHandlers = EventHandlers::from_json(json[std::string{"eventHandlers"}]);
+    const Try<EventHandlers> event_handlers = EventHandlers::from_json(json[std::string{"eventHandlers"}]);
     //Environment::from_json(json["environment"]),
-    const Try<MountPoints> mountPoints = MountPoints::from_json(json[std::string{"mountPoints"}]);
+    const Try<MountPoints> mount_points = MountPoints::from_json(json[std::string{"mountPoints"}]);
     //Ports::from_json(json["ports"]),
     const Try<Isolators> isolators = Isolators::from_json(json[std::string{"isolators"}]);
     return Result(App(*exec,
                       *user,
                       *group,
-                      *eventHandlers,
-                      *mountPoints,
+                      *event_handlers,
+                      *mount_points,
                       *isolators));
   }
 

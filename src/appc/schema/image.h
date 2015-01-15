@@ -5,7 +5,7 @@
 #include "appc/schema/annotations.h"
 #include "appc/schema/app.h"
 #include "appc/schema/dependencies.h"
-#include "appc/schema/imagename.h"
+#include "appc/schema/image_name.h"
 #include "appc/schema/labels.h"
 #include "appc/schema/path_whitelist.h"
 

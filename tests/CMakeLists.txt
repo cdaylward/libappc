@@ -3,14 +3,20 @@ enable_testing()
 
 include_directories(${GTEST_INCLUDE_DIRS})
 
+set(TESTS_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests)
+
+###
+
 add_executable(test-schema ${CMAKE_SOURCE_DIR}/tests/unit/appc/schema/test.cpp)
 target_link_libraries(test-schema gtest gtest_main)
+set_target_properties(test-schema PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TESTS_OUTPUT_DIRECTORY})
+
 add_test(test-schema
-  COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test-schema
+  COMMAND ${TESTS_OUTPUT_DIRECTORY}/test-schema
 )
 
 add_custom_target(check
   COMMAND ${CMAKE_CTEST_COMMAND} --verbose
-  DEPENDS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test-schema
+  DEPENDS ${TESTS_OUTPUT_DIRECTORY}/test-schema
 )
 

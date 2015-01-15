@@ -10,6 +10,10 @@ TODO
 
 Additional examples located in src/examples
 
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/cdaylward/libappc/blob/master/CONTRIBUTING.md)
+
 ## License
 
 libappc is licensed under the Apache License, Version 2.0.

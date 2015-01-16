@@ -106,41 +106,55 @@ int dumpAIM(const Json& json)
 
 int dumpCRM(const Json& json)
 {
-//  auto manifest = appc::schema::ContainerRuntimeManifest::from_json(json);
-//
-//  std::cout << "Kind: " << manifest.ac_kind.value << std::endl;
-//  std::cout << "Version: " << manifest.ac_version.value << std::endl;
-//  std::cout << "UUID: " << manifest.uuid.value << std::endl;
-//  std::cout << "Apps:" << std::endl;
-//  for (auto& app : manifest.apps.array) {
-//    std::cout << "  " << app.image_name.value << std::endl;
-//    std::cout << "    ImageID: " << app.image_id.value << std::endl;
-//    std::cout << "    Isolators:" << std::endl;
-//    for (auto& isolator : app.isolators.array) {
-//      std::cout << "      " << isolator.name << " -> " << isolator.value << std::endl;
-//    }
-//    std::cout << "    Annotations:" << std::endl;
-//    for (auto& annotation : app.annotations.array) {
-//      std::cout << "      " << annotation.name << " -> " << annotation.value << std::endl;
-//    }
-//  }
-//  std::cout << "Volumes:" << std::endl;
-//  for (auto& volume : manifest.volumes.array) {
-//    std::cout << "  Kind: " << volume.kind << std::endl;
-//    std::cout << "  Source: " << volume.source << std::endl;
-//    std::cout << "  ReadOnly: " << volume.readOnly << std::endl;
-//    std::cout << "  Fulfills: " << std::endl;
-//    for (auto& target : volume.fulfills) {
-//      std::cout << "    " << target << std::endl;
-//    }
-//  }
-//  std::cout << "Isolators:" << std::endl;
-//  for (auto& isolator : manifest.isolators.array) {
-//    std::cout << "  " << isolator.name << " -> " << isolator.value << std::endl;
-//  }
-//  std::cout << "Annotations:" << std::endl;
-//  for (auto& annotation : manifest.annotations.array) {
-//    std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;
-//  }
+  auto manifest_try = appc::schema::ContainerRuntimeManifest::from_json(json);
+  if (!manifest_try) {
+    std::cerr << "Could not parse manifest: " << std::endl;
+    std::cerr << manifest_try.failure_reason() << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  appc::schema::ContainerRuntimeManifest manifest = *manifest_try;
+
+
+  std::cout << "Kind: " << manifest.ac_kind.value << std::endl;
+  std::cout << "Version: " << manifest.ac_version.value << std::endl;
+  std::cout << "UUID: " << manifest.uuid.value << std::endl;
+  std::cout << "Apps:" << std::endl;
+  for (auto& app : manifest.images.array) {
+    std::cout << "  " << app.image_name.value << std::endl;
+    std::cout << "    ImageID: " << app.image_id.value << std::endl;
+    std::cout << "    Isolators:" << std::endl;
+    if (app.isolators) {
+      auto& isolators = *app.isolators;
+      for (auto& isolator : isolators.array) {
+        std::cout << "      " << isolator.name << " -> " << isolator.value << std::endl;
+      }
+    }
+    std::cout << "    Annotations:" << std::endl;
+    if (app.annotations) {
+      auto& annotations = *app.annotations;
+      for (auto& annotation : annotations.array) {
+        std::cout << "      " << annotation.name << " -> " << annotation.value << std::endl;
+      }
+    }
+  }
+  std::cout << "Volumes:" << std::endl;
+  for (auto& volume : manifest.volumes.array) {
+    std::cout << "  Kind: " << volume.kind << std::endl;
+    std::cout << "  Source: " << volume.source << std::endl;
+    std::cout << "  ReadOnly: " << volume.readOnly << std::endl;
+    std::cout << "  Fulfills: " << std::endl;
+    for (auto& target : volume.fulfills) {
+      std::cout << "    " << target << std::endl;
+    }
+  }
+  std::cout << "Isolators:" << std::endl;
+  for (auto& isolator : manifest.isolators.array) {
+    std::cout << "  " << isolator.name << " -> " << isolator.value << std::endl;
+  }
+  std::cout << "Annotations:" << std::endl;
+  for (auto& annotation : manifest.annotations.array) {
+    std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;
+  }
   return EXIT_SUCCESS;
 }

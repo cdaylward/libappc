@@ -4,11 +4,36 @@
 
 
 template<typename T>
-using Option = std::unique_ptr<T>;
+class Option {
+  private:
+  const std::shared_ptr<T> ptr;
+
+  public:
+  explicit Option<T>(const std::shared_ptr<T>& ptr)
+  : ptr(ptr) {}
+
+  explicit Option<T>(std::nullptr_t null) : ptr{nullptr} {}
+
+  operator bool() const {
+    return static_cast<bool>(ptr);
+  }
+
+  operator std::shared_ptr<T>() const {
+    return std::shared_ptr<T>(ptr);
+  }
+
+  T& operator*() const {
+    return *ptr;
+  }
+  const T& operator*() {
+    return *ptr;
+  }
+};
+
 
 template<typename T>
 Option<T>Some(const T& value) {
-    return Option<T>( new T(value) );
+  return Option<T>(std::make_shared<T>(value));
 }
 
 template<typename T>

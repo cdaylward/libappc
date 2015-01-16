@@ -19,7 +19,6 @@ add_subdirectory(3rdparty)
 #link_directories(${3RDPARTY_USR}/lib)
 
 add_subdirectory(${GTEST_ROOT})
-find_package(gtest REQUIRED)
 
 ######
 

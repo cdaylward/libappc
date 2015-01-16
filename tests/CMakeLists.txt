@@ -11,7 +11,8 @@ add_executable(test-schema EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/tests/unit/appc/
 target_link_libraries(test-schema gtest gtest_main)
 set_target_properties(test-schema PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${TESTS_OUTPUT_DIRECTORY})
 
-add_test(test-schema
+add_test(
+  NAME test-schema
   COMMAND ${TESTS_OUTPUT_DIRECTORY}/test-schema
 )
 

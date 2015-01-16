@@ -2,7 +2,7 @@
 
 ## Overview
 
-A C++ library for doing things with [App Containers](https://github.com/appc/spec). The goal of the libary is to be a flexible toolkit: manifest parsing and creation, pluggable discovery, image creation/extraction/caching, thin-provisioned file systems, etc. Configuration and data interchange will almost always be JSON. Some or all pieces may be used in varying implementations.
+A C++ library for doing things with [App Containers](https://github.com/appc/spec). The goal of the libary is to be a flexible toolkit: manifest parsing and creation, pluggable discovery, image creation/extraction/caching, thin-provisioned file systems, etc. Configuration and data interchange will almost always be JSON. Some or all pieces may be used.
 
 ## Getting Started
 
@@ -26,6 +26,8 @@ Build the examples:
 
 ## Examples
 
+Example code is located in src/examples. build.sh will build them and place them in bin/examples, e.g.
+
 ```
 $ ./bin/examples/parse .../image.json
 Kind: ImageManifest
@@ -38,11 +40,10 @@ Labels:
 --- 8< ---
 ```
 
-Additional examples located in src/examples
 
 ## Status
 
-Early, early development.
+Early, early (like really early) development. Most pieces are incomplete and require tests, build scripts need work, etc.
 
 ## Contributing
 

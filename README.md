@@ -4,15 +4,45 @@
 
 A C++ library for doing things with [App Containers](https://github.com/appc/spec). The goal of the libary is to be a flexible toolkit: manifest parsing and creation, pluggable discovery, image creation/extraction/caching, thin-provisioned file systems, etc. Configuration and data interchange will almost always be JSON. Some or all pieces may be used in varying implementations.
 
-## Status
+## Getting Started
 
-Early, early development.
+Bootstrap it (download and buld dependencies):
+
+```
+./bootstrap.sh
+```
+
+Run the tests:
+
+```
+./test.sh
+```
+
+Build the examples:
+
+```
+./build.sh
+```
 
 ## Examples
 
-TODO
+```
+$ ./bin/examples/parse .../image.json
+Kind: ImageManifest
+Version: 0.1.1
+Image Name: example.com/reduce-worker
+Labels:
+  version -> 1.0.0
+  arch -> amd64
+  os -> linux
+--- 8< ---
+```
 
 Additional examples located in src/examples
+
+## Status
+
+Early, early development.
 
 ## Contributing
 

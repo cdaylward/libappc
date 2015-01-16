@@ -7,7 +7,8 @@ libappc is licensed under the [Apache License, Version 2.0](https://github.com/c
 ## Getting Started
 
 * Fork the repository on GitHub.
-* Expriment wildly.
+* Run ```./bootstrap.sh && ./test.sh && ./build.sh```
+* Experiment wildly.
 * File bugs, submit pull requests for patches (many smaller commits are prefered to fix-all-the-things forklift patches).
 
 ## Commit Messages

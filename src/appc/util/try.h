@@ -19,29 +19,6 @@ class Try {
                   const std::string& reason)
   : reason(reason) {}
 
-  explicit Try<T>(std::function<T ()> func) {
-    try {
-      result = func();
-    } catch (const std::exception err) {
-      reason = err.what;
-    }
-  }
-
-  // Unwrap another Try
-  explicit Try<T>(std::function<Try<T> ()> func) {
-    try {
-      Try<T> a_try = func();
-      if (a_try) {
-        result = a_try;
-      }
-      else {
-        reason = a_try.failure_reason();
-      }
-    } catch (const std::exception err) {
-      reason = err.what();
-    }
-  }
-
   operator bool() const {
     return successful();
   }
@@ -83,4 +60,13 @@ Try<T> Failure(const std::string& reason) {
 template<typename T>
 const T& from_result(const Try<T>& success) {
   return *success;
+}
+
+template<typename T>
+Try<T> TryFrom(const std::function<T ()>& func) {
+  try {
+    return Result<T>(func());
+  } catch (const std::exception& err) {
+    return Failure<T>(err.what());
+  }
 }

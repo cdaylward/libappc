@@ -43,7 +43,7 @@ Labels:
 
 ## Status
 
-Early, early (like really early) development. Most pieces are incomplete and require tests, build scripts need work, etc.
+Early, early (like really early) development. Most pieces are incomplete and require tests, build scripts need work, use of syntax is inconsistent, etc.
 
 ## Contributing
 

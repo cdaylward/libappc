@@ -80,7 +80,7 @@ Try<T> Failure(const std::string& reason) {
   return Try<T>(nullptr, reason);
 }
 
-//template<typename T>
-//std::shared_ptr<T> from_success(const Try<T>& success) {
-//  return std::make_shared<T>(*success);
-//}
+template<typename T>
+const T& from_result(const Try<T>& success) {
+  return *success;
+}

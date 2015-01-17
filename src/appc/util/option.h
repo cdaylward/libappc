@@ -36,12 +36,14 @@ Option<T>Some(const T& value) {
   return Option<T>(std::make_shared<T>(value));
 }
 
+
 template<typename T>
 Option<T> None() {
   return Option<T>(nullptr);
 }
 
+
 template<typename T>
-const T& fromSome(const Option<T>& option) {
+const T& from_some(const Option<T>& option) {
   return *option;
 }

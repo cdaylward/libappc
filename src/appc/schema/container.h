@@ -3,7 +3,7 @@
 #include "appc/schema/ackind.h"
 #include "appc/schema/acversion.h"
 #include "appc/schema/annotations.h"
-#include "appc/schema/container_images.h"
+#include "appc/schema/app_refs.h"
 #include "appc/schema/isolators.h"
 #include "appc/schema/uuid.h"
 #include "appc/schema/volumes.h"
@@ -17,46 +17,91 @@ struct ContainerRuntimeManifest {
   const AcVersion ac_version;
   const AcKind ac_kind;
   const UUID uuid;
-  const Images images;
-  const Volumes volumes;
-  const Isolators isolators;
-  const Annotations annotations;
+  const AppRefs app_refs;
+  const Option<Volumes> volumes;
+  const Option<Isolators> isolators;
+  const Option<Annotations> annotations;
 
   explicit ContainerRuntimeManifest(const AcVersion& ac_version,
                                     const AcKind& ac_kind,
                                     const UUID& uuid,
-                                    const Images& images,
-                                    const Volumes& volumes,
-                                    const Isolators& isolators,
-                                    const Annotations& annotations)
+                                    const AppRefs& app_refs,
+                                    const Option<Volumes>& volumes,
+                                    const Option<Isolators>& isolators,
+                                    const Option<Annotations>& annotations)
     : ac_version(ac_version),
       ac_kind(ac_kind),
       uuid(uuid),
-      images(images),
+      app_refs(app_refs),
       volumes(volumes),
       isolators(isolators),
       annotations(annotations) {}
 
   static Try<ContainerRuntimeManifest> from_json(const Json& json) {
-    const Try<AcVersion> ac_version = AcVersion::from_json(json[std::string{"acVersion"}]);
-    const Try<AcKind> ac_kind = AcKind::from_json(json[std::string{"acKind"}]);
-    const Try<UUID> uuid = UUID::from_json(json[std::string{"uuid"}]);
-    const Try<Images> images = Images::from_json(json[std::string{"apps"}]);
-    const Try<Volumes> volumes = Volumes::from_json(json[std::string{"volumes"}]);
-    const Try<Isolators> isolators = Isolators::from_json(json[std::string{"isolators"}]);
-    const Try<Annotations> annotations = Annotations::from_json(json[std::string{"annotations"}]);
+    const auto ac_version = TryFlatten<AcVersion>([&json]() {
+      return AcVersion::from_json(json[std::string{"acVersion"}]);
+    });
+    const auto ac_kind = TryFlatten<AcKind>([&json]() {
+      return AcKind::from_json(json[std::string{"acKind"}]);
+    });
+    const auto uuid = TryFlatten<UUID>([&json]() {
+      return UUID::from_json(json[std::string{"uuid"}]);
+    });
+    const auto app_refs = TryFlatten<AppRefs>([&json]() {
+      return AppRefs::from_json(json[std::string{"apps"}]);
+    });
+
+    if (!SomeIfAll(ac_version, ac_kind, uuid, app_refs)) {
+      return collect_failure_reasons<ContainerRuntimeManifest>(ac_version, ac_kind, uuid, app_refs);
+    }
+
+    const auto volumes = OptionFromTry<Volumes>([&json]() {
+      return Volumes::from_json(json[std::string{"volumes"}]);
+    });
+    const auto isolators = OptionFromTry<Isolators>([&json]() {
+      return Isolators::from_json(json[std::string{"isolators"}]);
+    });
+    const auto annotations = OptionFromTry<Annotations>([&json]() {
+      return Annotations::from_json(json[std::string{"annotations"}]);
+    });
 
     return Result(ContainerRuntimeManifest(
         *ac_version,
         *ac_kind,
         *uuid,
-        *images,
-        *volumes,
-        *isolators,
-        *annotations));
+        *app_refs,
+        volumes,
+        isolators,
+        annotations));
   }
 
   Status validate() const {
+    auto required = collect_status({
+      ac_version.validate(),
+      ac_kind.validate(),
+      uuid.validate(),
+      app_refs.validate()});
+    if (!required) {
+      return required;
+    }
+    if (volumes) {
+      auto valid_volumes = volumes->validate();
+      if (!valid_volumes) {
+        return valid_volumes;
+      }
+    }
+    if (isolators) {
+      auto valid_isolators = isolators->validate();
+      if (!valid_isolators) {
+        return valid_isolators;
+      }
+    }
+    if (annotations) {
+      auto valid_annotations = annotations->validate();
+      if (!valid_annotations) {
+        return valid_annotations;
+      }
+    }
     return Valid();
   }
 };

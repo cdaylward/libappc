@@ -115,12 +115,18 @@ int dumpCRM(const Json& json)
 
   appc::schema::ContainerRuntimeManifest manifest = *manifest_try;
 
+  auto valid = manifest.validate();
+
+  if (!valid) {
+    std::cerr << "Manifest is invalid: " << valid.message << std::endl;
+    return EXIT_FAILURE;
+  }
 
   std::cout << "Kind: " << manifest.ac_kind.value << std::endl;
   std::cout << "Version: " << manifest.ac_version.value << std::endl;
   std::cout << "UUID: " << manifest.uuid.value << std::endl;
   std::cout << "Apps:" << std::endl;
-  for (auto& app : manifest.images.array) {
+  for (auto& app : manifest.app_refs.array) {
     std::cout << "  " << app.image_name.value << std::endl;
     std::cout << "    ImageID: " << app.image_id.value << std::endl;
     std::cout << "    Isolators:" << std::endl;
@@ -138,23 +144,41 @@ int dumpCRM(const Json& json)
       }
     }
   }
-  std::cout << "Volumes:" << std::endl;
-  for (auto& volume : manifest.volumes.array) {
-    std::cout << "  Kind: " << volume.kind << std::endl;
-    std::cout << "  Source: " << volume.source << std::endl;
-    std::cout << "  ReadOnly: " << volume.readOnly << std::endl;
-    std::cout << "  Fulfills: " << std::endl;
-    for (auto& target : volume.fulfills) {
-      std::cout << "    " << target << std::endl;
+  if (manifest.volumes) {
+    auto volumes = *manifest.volumes;
+    std::cout << "Volumes:" << std::endl;
+    for (auto& volume : volumes.array) {
+      std::cout << "  Kind: " << volume.kind << std::endl;
+      std::cout << "  Source: " << volume.source << std::endl;
+      std::cout << "  ReadOnly: " << volume.readOnly << std::endl;
+      std::cout << "  Fulfills: " << std::endl;
+      for (auto& target : volume.fulfills) {
+        std::cout << "    " << target << std::endl;
+      }
     }
   }
-  std::cout << "Isolators:" << std::endl;
-  for (auto& isolator : manifest.isolators.array) {
-    std::cout << "  " << isolator.name << " -> " << isolator.value << std::endl;
+  else {
+    std::cout << "No Volumes" << std::endl;
   }
-  std::cout << "Annotations:" << std::endl;
-  for (auto& annotation : manifest.annotations.array) {
-    std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;
+  if (manifest.isolators) {
+    auto isolators = *manifest.isolators;
+    std::cout << "Isolators:" << std::endl;
+    for (auto& isolator : isolators.array) {
+      std::cout << "  " << isolator.name << " -> " << isolator.value << std::endl;
+    }
+  }
+  else {
+    std::cout << "No Isolators" << std::endl;
+  }
+  if (manifest.annotations) {
+    auto annotations = *manifest.annotations;
+    std::cout << "Annotations:" << std::endl;
+    for (auto& annotation : annotations.array) {
+      std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;
+    }
+  }
+  else {
+    std::cout << "No Annotations" << std::endl;
   }
   return EXIT_SUCCESS;
 }

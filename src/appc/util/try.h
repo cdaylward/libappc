@@ -70,3 +70,12 @@ Try<T> TryFrom(const std::function<T ()>& func) {
     return Failure<T>(err.what());
   }
 }
+
+template<typename T>
+Try<T> TryFlatten(const std::function<Try<T> ()>& func) {
+  try {
+    return func();
+  } catch (const std::exception& err) {
+    return Failure<T>(err.what());
+  }
+}

@@ -36,6 +36,22 @@ Status Invalid(const std::string& message) {
 }
 
 
+Status collect_status(const std::vector<Status>& statuses) {
+  std::string message{};
+  bool successful{true};
+  for (auto& status: statuses) {
+    if (!status) {
+      successful = false;
+      if (!message.empty()) {
+        message += ", ";
+      }
+      message += "\"" + status.message + "\"";
+    }
+  }
+  return Status(successful, message);
+}
+
+
 template<typename T>
 struct Type {
   virtual ~Type() = default;

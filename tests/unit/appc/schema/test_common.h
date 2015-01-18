@@ -17,6 +17,12 @@ TEST(Status, invalid_is_false) {
   ASSERT_FALSE(Invalid("invalid"));
 }
 
+TEST(Status, collect_status) {
+  ASSERT_TRUE(collect_status({Valid(), Valid()}));
+  auto invalid = collect_status({Invalid("one"), Invalid("two"), Valid()});
+  ASSERT_FALSE(invalid);
+  ASSERT_EQ(std::string{"\"one\", \"two\""}, invalid.message);
+}
 
 struct SomeStringType : StringType<SomeStringType> {
   explicit SomeStringType(const std::string& val)

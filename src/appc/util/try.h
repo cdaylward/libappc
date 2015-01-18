@@ -42,8 +42,13 @@ class Try {
   T& operator*() const {
     return *result;
   }
+
   const T& operator*() {
     return *result;
+  }
+
+  T* operator->() const {
+    return result.get();
   }
 };
 

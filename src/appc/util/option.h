@@ -25,6 +25,7 @@ class Option {
   T& operator*() const {
     return *ptr;
   }
+
   const T& operator*() {
     return *ptr;
   }

@@ -28,6 +28,10 @@ class Option {
   const T& operator*() {
     return *ptr;
   }
+
+  T* operator->() const {
+    return ptr.get();
+  }
 };
 
 
@@ -47,3 +51,4 @@ template<typename T>
 const T& from_some(const Option<T>& option) {
   return *option;
 }
+

@@ -47,20 +47,24 @@ class Try {
   }
 };
 
+
 template<typename T>
 Try<T> Result(const T& value) {
   return Try<T>(std::make_shared<T>(value), "");
 }
+
 
 template<typename T>
 Try<T> Failure(const std::string& reason) {
   return Try<T>(nullptr, reason);
 }
 
+
 template<typename T>
 const T& from_result(const Try<T>& success) {
   return *success;
 }
+
 
 template<typename T>
 Try<T> TryFrom(const std::function<T ()>& func) {
@@ -71,11 +75,25 @@ Try<T> TryFrom(const std::function<T ()>& func) {
   }
 }
 
+
+template<typename T>
+Try<T> TryFlatten(const Try<T>& a_try) {
+  return a_try;
+}
+
+
+template<typename T>
+Try<T> TryFlatten(const Try<Try<T>>& a_try) {
+  return TryFlatten(*a_try);
+}
+
+
 template<typename T>
 Try<T> TryFlatten(const std::function<Try<T> ()>& func) {
   try {
-    return func();
+    return TryFlatten(func());
   } catch (const std::exception& err) {
     return Failure<T>(err.what());
   }
 }
+

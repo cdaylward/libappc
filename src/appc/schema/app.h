@@ -5,7 +5,7 @@
 #include "appc/schema/exec.h"
 #include "appc/schema/group.h"
 #include "appc/schema/isolators.h"
-#include "appc/schema/mount_pounts.h"
+#include "appc/schema/mount_points.h"
 #include "appc/schema/user.h"
 
 

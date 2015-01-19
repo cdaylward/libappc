@@ -6,9 +6,12 @@
 namespace appc {
 namespace schema {
 
+using ReadOnly = bool;
 
 const std::string fulfills_field{"fulfills"};
 const std::string kind_field{"kind"};
+const std::string source_field{"source"};
+const std::string read_only_field{"readOnly"};
 
 
 struct VolumeKind : StringType<VolumeKind> {
@@ -36,14 +39,32 @@ struct MountPointNames : ArrayType<MountPointNames, MountPointName> {
 };
 
 
+// TODO this should be a Path type
+struct VolumeSource : StringType<VolumeSource> {
+  explicit VolumeSource(const std::string& path)
+  : StringType<VolumeSource>(path) {}
+
+  Status validate() const {
+    // TODO
+    return Valid();
+  }
+};
+
+
 struct Volume : Type<Volume> {
   const VolumeKind kind;
   const MountPointNames fulfills;
+  const VolumeSource source;
+  const ReadOnly read_only;
 
   explicit Volume(const VolumeKind& kind,
-                  const MountPointNames& fulfills)
+                  const MountPointNames& fulfills,
+                  const VolumeSource& source,
+                  const ReadOnly read_only)
   : kind(kind),
-    fulfills(fulfills) {}
+    fulfills(fulfills),
+    source(source),
+    read_only(read_only) {}
 
   static Try<Volume> from_json(const Json& json) {
     const auto kind = TryFlatten<VolumeKind>([&json]() {
@@ -57,8 +78,29 @@ struct Volume : Type<Volume> {
       return collect_failure_reasons<Volume>(kind, fulfills);
     }
 
+    const auto read_only_try = TryFrom<bool>([&json]() {
+      return json[read_only_field].get<bool>();
+    });
+
+    ReadOnly read_only{false};
+    if (read_only_try) {
+      read_only = *read_only_try;
+    }
+
+    if (kind->value == "host") {
+      const auto source = TryFlatten<VolumeSource>([&json]() {
+        return VolumeSource::from_json(json[source_field]);
+      });
+      return Result(Volume(*kind,
+                           *fulfills,
+                           *source,
+                           read_only));
+    }
+
     return Result(Volume(*kind,
-                         *fulfills));
+                         *fulfills,
+                         VolumeSource(""),
+                         read_only));
   }
 
   Status validate() const {

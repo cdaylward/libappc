@@ -6,48 +6,76 @@
 namespace appc {
 namespace schema {
 
+
 const std::string fulfills_field{"fulfills"};
 const std::string kind_field{"kind"};
-const std::string read_only_field{"readOnly"};
-const std::string source_field{"source"};
 
-// TODO(cdaylward) clean up types
+
+struct VolumeKind : StringType<VolumeKind> {
+  explicit VolumeKind(const std::string& kind)
+  : StringType<VolumeKind>(kind) {}
+
+  Status validate() const {
+    if (value != "empty" && value != "host") {
+      return Invalid("Volume kind must be 'empty' or 'host'");
+    }
+    return Valid();
+  }
+};
+
+
+struct MountPointName : ACName<MountPointName> {
+  explicit MountPointName(const std::string& mount_point)
+  : ACName<MountPointName>(mount_point) {}
+};
+
+
+struct MountPointNames : ArrayType<MountPointNames, MountPointName> {
+  explicit MountPointNames(const std::vector<MountPointName> array)
+  : ArrayType<MountPointNames, MountPointName>(array) {}
+
+  Status validate() const {
+    for (const auto& mount_point : array) {
+      auto valid = mount_point.validate();
+      if (!valid) {
+        return valid;
+      }
+    }
+    return Valid();
+  }
+};
+
+
 struct Volume : Type<Volume> {
-  const std::string kind;
-  const std::string source;
-  const bool readOnly;
-  std::vector<std::string> fulfills;
+  const VolumeKind kind;
+  const MountPointNames fulfills;
 
-  explicit Volume(const std::string& kind,
-                  const std::string& source,
-                  const bool readOnly,
-                  const std::vector<std::string>& fulfills)
-    : kind(kind),
-      source(source),
-      readOnly(readOnly),
-      fulfills(fulfills) {}
+  explicit Volume(const VolumeKind& kind,
+                  const MountPointNames& fulfills)
+  : kind(kind),
+    fulfills(fulfills) {}
 
   static Try<Volume> from_json(const Json& json) {
-    std::vector<std::string> fulfills {};
-    for (auto& target : json[fulfills_field]) {
-      fulfills.push_back(target.get<std::string>());
+    const auto kind = TryFlatten<VolumeKind>([&json]() {
+      return VolumeKind::from_json(json[kind_field]);
+    });
+    const auto fulfills = TryFlatten<MountPointNames>([&json]() {
+      return MountPointNames::from_json(json[fulfills_field]);
+    });
+
+    if (!SomeIfAll(kind, fulfills)) {
+      return collect_failure_reasons<Volume>(kind, fulfills);
     }
-    bool readOnly { false };
-    if (json.find(read_only_field) != json.end()) {
-      readOnly = json[read_only_field].get<bool>();
-    }
-    std::string source {};
-    if (json.find(source_field) != json.end()) {
-      source = json[source_field].get<std::string>();;
-    }
-    return Result(Volume(json[kind_field].get<std::string>(),
-                         source,
-                         readOnly,
-                         fulfills));
+
+    return Result(Volume(*kind,
+                         *fulfills));
   }
 
   Status validate() const {
-    return Valid();
+    return collect_status({
+      kind.validate(),
+      fulfills.validate()
+    });
   }
 };
 

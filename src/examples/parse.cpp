@@ -150,12 +150,10 @@ int dumpCRM(const Json& json)
     auto volumes = *manifest.volumes;
     std::cout << "Volumes:" << std::endl;
     for (auto& volume : volumes.array) {
-      std::cout << "  Kind: " << volume.kind << std::endl;
-      std::cout << "  Source: " << volume.source << std::endl;
-      std::cout << "  ReadOnly: " << volume.readOnly << std::endl;
+      std::cout << "  Kind: " << volume.kind.value << std::endl;
       std::cout << "  Fulfills: " << std::endl;
-      for (auto& target : volume.fulfills) {
-        std::cout << "    " << target << std::endl;
+      for (auto& target : volume.fulfills.array) {
+        std::cout << "    " << target.value << std::endl;
       }
     }
   }

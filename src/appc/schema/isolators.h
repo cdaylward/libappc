@@ -27,16 +27,6 @@ struct Isolator : NameValueType<Isolator> {
 struct Isolators : ArrayType<Isolators, Isolator> {
   explicit Isolators(const std::vector<Isolator> array)
   : ArrayType<Isolators, Isolator>(array) {}
-
-  Status validate() const {
-    for (const auto& annotation : array) {
-      auto valid = annotation.validate();
-      if (!valid) {
-        return valid;
-      }
-    }
-    return Valid();
-  }
 };
 
 

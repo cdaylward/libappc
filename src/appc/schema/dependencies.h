@@ -42,11 +42,6 @@ struct Dependency : Type<Dependency> {
 struct Dependencies : ArrayType<Dependencies, Dependency> {
   explicit Dependencies(const std::vector<Dependency>& dependencies)
   : ArrayType<Dependencies, Dependency>(dependencies) {}
-
-  Status validate() const {
-    // TODO(cdaylward)
-    return Valid();
-  }
 };
 
 

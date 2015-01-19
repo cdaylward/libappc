@@ -65,16 +65,6 @@ struct AppRef : Type<AppRef> {
 struct AppRefs : ArrayType<AppRefs, AppRef> {
   explicit AppRefs(const std::vector<AppRef>& images)
   : ArrayType<AppRefs, AppRef>(images) {}
-
-  Status validate() const {
-    for (const auto& app_ref : array) {
-      auto valid = app_ref.validate();
-      if (!valid) {
-        return valid;
-      }
-    }
-    return Valid();
-  }
 };
 
 

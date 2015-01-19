@@ -36,16 +36,6 @@ struct Annotations : ArrayType<Annotations, Annotation> {
     }
     return map;
   }
-
-  Status validate() const {
-    for (const auto& annotation : array) {
-      auto valid = annotation.validate();
-      if (!valid) {
-        return valid;
-      }
-    }
-    return Valid();
-  }
 };
 
 

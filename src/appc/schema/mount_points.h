@@ -38,11 +38,6 @@ struct MountPoint : Type<MountPoint> {
 struct MountPoints : ArrayType<MountPoints, MountPoint> {
   explicit MountPoints(const std::vector<MountPoint>& args)
   : ArrayType<MountPoints, MountPoint>(args) {}
-
-  Status validate() const {
-    // TODO(cdaylward)
-    return Valid();
-  }
 };
 
 

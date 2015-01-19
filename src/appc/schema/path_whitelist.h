@@ -21,11 +21,6 @@ struct Path : StringType<Path> {
 struct PathWhitelist : ArrayType<PathWhitelist, Path> {
   explicit PathWhitelist(const std::vector<Path>& paths)
   : ArrayType<PathWhitelist, Path>(paths) {}
-
-  Status validate() const {
-    // TODO(cdaylward)
-    return Valid();
-  }
 };
 
 

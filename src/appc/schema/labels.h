@@ -35,16 +35,6 @@ struct Labels : ArrayType<Labels, Label> {
     }
     return map;
   }
-
-  Status validate() const {
-    for (const auto& label : array) {
-      auto valid = label.validate();
-      if (!valid) {
-        return valid;
-      }
-    }
-    return Valid();
-  }
 };
 
 

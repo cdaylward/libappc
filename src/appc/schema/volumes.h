@@ -33,16 +33,6 @@ struct MountPointName : ACName<MountPointName> {
 struct MountPointNames : ArrayType<MountPointNames, MountPointName> {
   explicit MountPointNames(const std::vector<MountPointName> array)
   : ArrayType<MountPointNames, MountPointName>(array) {}
-
-  Status validate() const {
-    for (const auto& mount_point : array) {
-      auto valid = mount_point.validate();
-      if (!valid) {
-        return valid;
-      }
-    }
-    return Valid();
-  }
 };
 
 
@@ -83,11 +73,6 @@ struct Volume : Type<Volume> {
 struct Volumes : ArrayType<Volumes, Volume> {
   explicit Volumes(const std::vector<Volume> array)
   : ArrayType<Volumes, Volume>(array) {}
-
-  Status validate() const {
-    // TODO
-    return Valid();
-  }
 };
 
 

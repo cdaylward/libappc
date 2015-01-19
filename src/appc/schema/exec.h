@@ -21,11 +21,6 @@ struct ExecArg : StringType<ExecArg> {
 struct Exec : ArrayType<Exec, ExecArg> {
   explicit Exec(const std::vector<ExecArg>& args)
   : ArrayType<Exec, ExecArg>(args) {}
-
-  Status validate() const {
-    // TODO(cdaylward)
-    return Valid();
-  }
 };
 
 

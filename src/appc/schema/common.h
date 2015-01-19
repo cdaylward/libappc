@@ -138,6 +138,16 @@ struct ArrayType : Type<T> {
     }
     return Result(T{array});
   }
+
+  virtual Status validate() const {
+    for (const auto& element : this->array) {
+      auto valid = element.validate();
+      if (!valid) {
+        return valid;
+      }
+    }
+    return Valid();
+  }
 };
 
 

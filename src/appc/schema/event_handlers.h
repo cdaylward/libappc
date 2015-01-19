@@ -48,10 +48,6 @@ struct EventHandler : Type<EventHandler> {
 struct EventHandlers : ArrayType<EventHandlers, EventHandler> {
   explicit EventHandlers(const std::vector<EventHandler>& args)
   : ArrayType<EventHandlers, EventHandler>(args) {}
-
-  Status validate() const {
-    return Valid();
-  }
 };
 
 

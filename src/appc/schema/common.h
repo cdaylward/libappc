@@ -128,8 +128,6 @@ struct ArrayType : Type<T> {
     }
     return Result(T{array});
   }
-
-  // TODO(cdaylward) provide validate() here?
 };
 
 
@@ -155,8 +153,13 @@ struct NameValueType : Type<T> {
     if (json.type() != Json::value_type::object) {
       return Failure<T>("NameValue types must be initialized from JSON objects");
     }
-    return Result(T(json[std::string{"name"}].get<std::string>(),
-                    json[std::string{"value"}].get<std::string>()));
+    try {
+      return Result(T(json[std::string{"name"}].get<std::string>(),
+                      json[std::string{"value"}].get<std::string>()));
+    } catch (const std::exception& err) {
+      return Failure<T>(err.what());
+    }
+    return Failure<T>("NameValue must be a {\"name\": \"<name>\", \"value\": \"<value>\" } object.");
   }
 
   static Json to_json(const NameValueType& nameval) {

@@ -127,8 +127,10 @@ int dumpCRM(const Json& json)
   std::cout << "UUID: " << manifest.uuid.value << std::endl;
   std::cout << "Apps:" << std::endl;
   for (auto& app : manifest.app_refs.array) {
-    std::cout << "  " << app.image_name.value << std::endl;
     std::cout << "    ImageID: " << app.image_id.value << std::endl;
+    if (app.app_name) {
+      std::cout << "    App: " << app.app_name->value << std::endl;
+    }
     std::cout << "    Isolators:" << std::endl;
     if (app.isolators) {
       auto& isolators = *app.isolators;

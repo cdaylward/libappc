@@ -7,14 +7,9 @@ namespace appc {
 namespace schema {
 
 
-struct AppName : StringType<AppName> {
+struct AppName : public ACName<AppName> {
   explicit AppName(const std::string& name)
-  : StringType<AppName>(name) {}
-
-  Status validate() const {
-    //TODO(cdaylward)
-    return Valid();
-  }
+  : ACName<AppName>(name) {}
 };
 
 

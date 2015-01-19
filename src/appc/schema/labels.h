@@ -7,14 +7,19 @@ namespace appc {
 namespace schema {
 
 
+struct LabelName : ACName<LabelName> {
+  explicit LabelName(const std::string& name)
+  : ACName<LabelName>(name) {}
+};
+
+
 struct Label : NameValueType<Label> {
   explicit Label(const std::string& name,
                  const std::string& value)
   : NameValueType<Label>(name, value) {}
 
   Status validate() const {
-    // TODO(cdaylward)
-    return Valid();
+    return LabelName(name).validate();
   }
 };
 
@@ -32,7 +37,12 @@ struct Labels : ArrayType<Labels, Label> {
   }
 
   Status validate() const {
-    // TODO(cdaylward)
+    for (const auto& label : array) {
+      auto valid = label.validate();
+      if (!valid) {
+        return valid;
+      }
+    }
     return Valid();
   }
 };

@@ -8,18 +8,18 @@ using namespace appc::schema;
 
 
 TEST(Label, from_json) {
-  const Json json = { {"name", "Given Name"}, {"value", "Herbert"} };
+  const Json json = { {"name", "name.given"}, {"value", "Herbert"} };
   std::shared_ptr<Label> result = Label::from_json(json);
   Label& label = *result;
-  ASSERT_EQ(std::string{"Given Name"}, label.name);
+  ASSERT_EQ(std::string{"name.given"}, label.name);
   ASSERT_EQ(std::string{"Herbert"}, label.value);
   ASSERT_TRUE(label.validate());
 }
 // TODO invalid labels, test known, os, arch, version
 
 TEST(Label, to_json) {
-  const Json expected_json = { {"name", "Given Name"}, {"value", "Herbert"} };
-  const Json json = Label::to_json(Label{"Given Name", "Herbert"});
+  const Json expected_json = { {"name", "name.given"}, {"value", "Herbert"} };
+  const Json json = Label::to_json(Label{"name.given", "Herbert"});
   ASSERT_EQ(expected_json, json);
 }
 

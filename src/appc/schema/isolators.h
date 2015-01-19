@@ -7,14 +7,19 @@ namespace appc {
 namespace schema {
 
 
+struct IsolatorName : ACName<IsolatorName> {
+  explicit IsolatorName(const std::string& name)
+  : ACName<IsolatorName>(name) {}
+};
+
+
 struct Isolator : NameValueType<Isolator> {
   explicit Isolator(const std::string& name,
                     const std::string& value)
   : NameValueType<Isolator>(name, value) {}
 
   Status validate() const {
-    // TODO(cdaylward)
-    return Valid();
+    return IsolatorName(name).validate();
   }
 };
 
@@ -24,7 +29,12 @@ struct Isolators : ArrayType<Isolators, Isolator> {
   : ArrayType<Isolators, Isolator>(array) {}
 
   Status validate() const {
-    // TODO(cdaylward)
+    for (const auto& annotation : array) {
+      auto valid = annotation.validate();
+      if (!valid) {
+        return valid;
+      }
+    }
     return Valid();
   }
 };

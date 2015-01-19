@@ -8,22 +8,25 @@
 namespace appc {
 namespace schema {
 
+
 const unsigned int max_ac_name_length = 512;
 
-struct ACName : StringType<ACName> {
-  explicit ACName(const std::string& name)
-  : StringType<ACName>(name) {}
+
+template<typename T>
+struct ACName : StringType<T> {
+  explicit ACName<T>(const std::string& name)
+  : StringType<T>(name) {}
 
   virtual Status validate() const {
-    if (value.empty()) {
+    if (this->value.empty()) {
       return Invalid("ACName must not be empty.");
     }
-    if (value.size() > max_ac_name_length) {
+    if (this->value.size() > max_ac_name_length) {
       return Invalid("ACName must not be longer than " + max_ac_name_length);
     }
     const std::regex pattern("[a-z0-9]+([a-z0-9-\\./]*[a-z0-9])*",
                              std::regex::ECMAScript);
-    if (!std::regex_match(value, pattern)) {
+    if (!std::regex_match(this->value, pattern)) {
       return Invalid("ACName must comply with rfc1123 + allow '/'");
     }
     return Valid();

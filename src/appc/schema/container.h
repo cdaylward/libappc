@@ -76,33 +76,15 @@ struct ContainerRuntimeManifest {
   }
 
   Status validate() const {
-    auto required = collect_status({
+    return collect_status({
       ac_version.validate(),
       ac_kind.validate(),
       uuid.validate(),
-      app_refs.validate()});
-    if (!required) {
-      return required;
-    }
-    if (volumes) {
-      auto valid_volumes = volumes->validate();
-      if (!valid_volumes) {
-        return valid_volumes;
-      }
-    }
-    if (isolators) {
-      auto valid_isolators = isolators->validate();
-      if (!valid_isolators) {
-        return valid_isolators;
-      }
-    }
-    if (annotations) {
-      auto valid_annotations = annotations->validate();
-      if (!valid_annotations) {
-        return valid_annotations;
-      }
-    }
-    return Valid();
+      app_refs.validate(),
+      validate_if_some(volumes),
+      validate_if_some(isolators),
+      validate_if_some(annotations),
+    });
   }
 };
 

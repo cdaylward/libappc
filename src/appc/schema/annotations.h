@@ -8,13 +8,19 @@ namespace appc {
 namespace schema {
 
 
+struct AnnotationName : ACName<AnnotationName> {
+  explicit AnnotationName(const std::string& name)
+  : ACName<AnnotationName>(name) {}
+};
+
+
 struct Annotation : NameValueType<Annotation> {
   explicit Annotation(const std::string& name,
                       const std::string& value)
   : NameValueType<Annotation>(name, value) {}
 
   Status validate() const {
-    return ACName(name).validate();
+    return AnnotationName(name).validate();
   }
 };
 

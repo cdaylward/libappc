@@ -3,6 +3,7 @@
 #include "test_ac_name.h"
 #include "test_ac_kind.h"
 #include "test_ac_version.h"
+#include "test_annotations.h"
 #include "test_app.h"
 #include "test_common.h"
 #include "test_image.h"

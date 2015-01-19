@@ -2,6 +2,7 @@
 
 #include "3rdparty/nlohmann/json.h"
 
+#include "appc/util/option.h"
 #include "appc/util/try.h"
 
 
@@ -49,6 +50,15 @@ Status collect_status(const std::vector<Status>& statuses) {
     }
   }
   return Status(successful, message);
+}
+
+
+template<typename T>
+Status validate_if_some(const Option<T>& option) {
+  if (option) {
+    return option->validate();
+  }
+  return Valid();
 }
 
 

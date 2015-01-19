@@ -1,7 +1,7 @@
 #pragma once
 
-#include "appc/schema/ackind.h"
-#include "appc/schema/acversion.h"
+#include "appc/schema/ac_kind.h"
+#include "appc/schema/ac_version.h"
 #include "appc/schema/annotations.h"
 #include "appc/schema/app_refs.h"
 #include "appc/schema/isolators.h"

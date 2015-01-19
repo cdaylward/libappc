@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "appc/schema/ackind.h"
+#include "appc/schema/ac_kind.h"
 
 using namespace appc::schema;
 

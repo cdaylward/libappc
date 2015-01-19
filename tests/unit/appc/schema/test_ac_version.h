@@ -2,7 +2,8 @@
 
 #include "gtest/gtest.h"
 
-#include "appc/schema/acversion.h"
+#include "appc/schema/ac_version.h"
+
 
 using namespace appc::schema;
 

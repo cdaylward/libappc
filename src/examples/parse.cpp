@@ -21,10 +21,15 @@ int main(int args, char** argv) {
   }
 
   std::ifstream f(argv[1]);
+  if (!f) {
+    std::cerr << "Could not open " << argv[1] << std::endl;
+    return EXIT_FAILURE;
+  }
   std::stringstream buffer {};
   buffer << f.rdbuf();
   std::string json_str { buffer.str() };
 
+  // Will throw invalid_argument if not valid JSON
   Json manifest = Json::parse(json_str);
 
   if (manifest["acKind"] == "ContainerRuntimeManifest") {
@@ -129,20 +134,20 @@ int dumpCRM(const Json& json)
   for (auto& app : manifest.app_refs.array) {
     std::cout << "    ImageID: " << app.image_id.value << std::endl;
     if (app.app_name) {
-      std::cout << "    App: " << app.app_name->value << std::endl;
+      std::cout << "      App: " << app.app_name->value << std::endl;
     }
-    std::cout << "    Isolators:" << std::endl;
+    std::cout << "      Isolators:" << std::endl;
     if (app.isolators) {
       auto& isolators = *app.isolators;
       for (auto& isolator : isolators.array) {
-        std::cout << "      " << isolator.name << " -> " << isolator.value << std::endl;
+        std::cout << "        " << isolator.name << " -> " << isolator.value << std::endl;
       }
     }
-    std::cout << "    Annotations:" << std::endl;
+    std::cout << "      Annotations:" << std::endl;
     if (app.annotations) {
       auto& annotations = *app.annotations;
       for (auto& annotation : annotations.array) {
-        std::cout << "      " << annotation.name << " -> " << annotation.value << std::endl;
+        std::cout << "        " << annotation.name << " -> " << annotation.value << std::endl;
       }
     }
   }

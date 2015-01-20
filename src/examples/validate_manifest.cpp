@@ -21,10 +21,16 @@ int main(int args, char** argv) {
   }
 
   std::ifstream f(argv[1]);
+  if (!f) {
+    std::cerr << "Could not open " << argv[1] << std::endl;
+    return EXIT_FAILURE;
+  }
+
   std::stringstream buffer {};
   buffer << f.rdbuf();
   std::string json_str { buffer.str() };
 
+  // Will throw invalid_argument if not valid JSON
   const Json manifest = Json::parse(json_str);
   const std::string kind = manifest[std::string{"acKind"}];
 

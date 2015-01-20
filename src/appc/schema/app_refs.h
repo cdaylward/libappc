@@ -11,6 +11,7 @@ namespace appc {
 namespace schema {
 
 
+// AppRef is the CRM entity that refers to an existing app/image.
 struct AppRef : Type<AppRef> {
   const ImageID image_id;
   const Option<AppName> app_name;

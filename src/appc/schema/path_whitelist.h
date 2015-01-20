@@ -1,21 +1,11 @@
 #pragma once
 
 #include "appc/schema/common.h"
+#include "appc/schema/path.h"
 
 
 namespace appc {
 namespace schema {
-
-
-struct Path : StringType<Path> {
-  explicit Path(const std::string& path)
-  : StringType<Path>(path) {}
-
-  Status validate() const {
-    // TODO(cdaylward)
-    return Valid();
-  }
-};
 
 
 struct PathWhitelist : ArrayType<PathWhitelist, Path> {

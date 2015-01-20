@@ -14,6 +14,8 @@ int dumpAIM(const Json& json);
 int dumpCRM(const Json& json);
 
 
+// There isn't any real point to dumpAIM and dumpCRM other than anillustration of how to parse
+// and access a manifest.
 int main(int args, char** argv) {
   if (args < 2) {
     std::cerr << "Usage: " << argv[0] << " <image or container manifest to parse>" << std::endl;
@@ -59,51 +61,81 @@ int dumpAIM(const Json& json)
 
   std::cout << "Kind: " << manifest.ac_kind.value << std::endl;
   std::cout << "Version: " << manifest.ac_version.value << std::endl;
-  std::cout << "Image Name: " << manifest.image_name.value << std::endl;
-  std::cout << "Labels:" << std::endl;
-  for (auto& label : manifest.labels.array) {
-    std::cout << "  " << label.name << " -> " << label.value << std::endl;
+  std::cout << "Name: " << manifest.name.value << std::endl;
+  if (manifest.labels) {
+    auto labels = *manifest.labels;
+    std::cout << "Labels:" << std::endl;
+    for (auto& label : labels.array) {
+      std::cout << "  " << label.name << " -> " << label.value << std::endl;
+    }
   }
-  std::cout << "App:" << std::endl;
+  if (manifest.app) {
+    auto app = *manifest.app;
+    std::cout << "App:" << std::endl;
     std::cout << "  Exec:" << std::endl;
-    for (auto& arg : manifest.app.exec.array) {
+    for (auto& arg : app.exec.array) {
       std::cout << "    " << arg.value << std::endl;
     }
-    std::cout << "  User: " << manifest.app.user.value << std::endl;
-    std::cout << "  Group: " << manifest.app.group.value << std::endl;
-    std::cout << "  Event Handlers:" << std::endl;
-    for (auto& handler : manifest.app.event_handlers.array) {
-      std::cout << "    " << handler.name.value << std::endl;
-      for (auto& arg : handler.exec.array) {
-      std::cout << "      " << arg.value << std::endl;
+    std::cout << "  User: " << app.user.value << std::endl;
+    std::cout << "  Group: " << app.group.value << std::endl;
+    if (app.event_handlers) {
+      auto event_handlers = *app.event_handlers;
+      std::cout << "  Event Handlers:" << std::endl;
+      for (auto& handler : event_handlers.array) {
+        std::cout << "    " << handler.name.value << std::endl;
+        for (auto& arg : handler.exec.array) {
+        std::cout << "      " << arg.value << std::endl;
+        }
       }
     }
-    std::cout << "  Isolators:" << std::endl;
-    for (auto& isolator : manifest.app.isolators.array) {
-      std::cout << "    " << isolator.name << " -> " << isolator.value << std::endl;
+    if (app.isolators) {
+      auto isolators = *app.isolators;
+      std::cout << "  Isolators:" << std::endl;
+      for (auto& isolator : isolators.array) {
+        std::cout << "    " << isolator.name << " -> " << isolator.value << std::endl;
+      }
     }
-    std::cout << "  Mount Points:" << std::endl;
-    for (auto& mount : manifest.app.mount_points.array) {
-      std::cout << "    " << mount.name << std::endl;
-      std::cout << "      Path: " << mount.path << std::endl;
-      std::cout << "      Read Only: " << mount.readOnly << std::endl;
-    }
-  std::cout << "Dependencies:" << std::endl;
-  for (auto& dep : manifest.dependencies.array) {
-    std::cout << "  " << dep.app_name.value << std::endl;
-    std::cout << "    Image ID: " << dep.image_id.value << std::endl;
-    std::cout << "    Labels:" << std::endl;
-    for (auto& label : dep.labels.array) {
-      std::cout << "      " << label.name << " -> " << label.value << std::endl;
+    if (app.mount_points) {
+      auto mount_points = *app.mount_points;
+      std::cout << "  Mount Points:" << std::endl;
+      for (auto& mount : mount_points.array) {
+        std::cout << "    " << mount.name << std::endl;
+        std::cout << "      Path: " << mount.path << std::endl;
+        std::cout << "      Read Only: " << mount.readOnly << std::endl;
+      }
     }
   }
-  std::cout << "Path Whitelist:" << std::endl;
-  for (auto& path : manifest.path_whitelist.array) {
-    std::cout << "  " << path.value << std::endl;
+  if (manifest.dependencies) {
+    auto dependencies = *manifest.dependencies;
+    std::cout << "Dependencies:" << std::endl;
+    for (auto& dep : dependencies.array) {
+      std::cout << "  " << dep.app_name.value << std::endl;
+      if (dep.image_id) {
+        auto image_id = *dep.image_id;
+        std::cout << "    Image ID: " << image_id.value << std::endl;
+      }
+      if (dep.labels) {
+        auto labels = *dep.labels;
+        std::cout << "    Labels:" << std::endl;
+        for (auto& label : labels.array) {
+          std::cout << "      " << label.name << " -> " << label.value << std::endl;
+        }
+      }
+    }
   }
-  std::cout << "Annotations:" << std::endl;
-  for (auto& annotation : manifest.annotations.array) {
-    std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;
+  if (manifest.path_whitelist) {
+    auto path_whitelist = *manifest.path_whitelist;
+    std::cout << "Path Whitelist:" << std::endl;
+    for (auto& path : path_whitelist.array) {
+      std::cout << "  " << path.value << std::endl;
+    }
+  }
+  if (manifest.annotations) {
+    auto annotations = *manifest.annotations;
+    std::cout << "Annotations:" << std::endl;
+    for (auto& annotation : annotations.array) {
+      std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;
+    }
   }
 
   return EXIT_SUCCESS;

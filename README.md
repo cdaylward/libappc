@@ -2,11 +2,13 @@
 
 ## Overview
 
-A C++ library for doing things with [App Containers](https://github.com/appc/spec). The goal of the libary is to be a flexible toolkit: manifest parsing and creation, pluggable discovery, image creation/extraction/caching, thin-provisioned file systems, etc. Configuration and data interchange will almost always be JSON. Some or all pieces may be used.
+A C++ library for doing things with [App Containers](https://github.com/appc/spec). The goal of the libary is to be a flexible toolkit: manifest parsing and creation, pluggable discovery, image creation/extraction/caching, thin-provisioned file systems, etc. Configuration and data interchange will almost always be JSON. Some or all pieces may be used, just use the headers you require.
 
 ## Getting Started
 
-Bootstrap it (download and buld dependencies):
+Requires functional std::regex (If using gcc, >= 4.9)
+
+Bootstrap it (download and build dependencies):
 
 ```
 ./bootstrap.sh
@@ -29,21 +31,17 @@ Build the examples:
 Example code is located in src/examples. build.sh will build them and place them in bin/examples, e.g.
 
 ```
-$ ./bin/examples/parse .../image.json
-Kind: ImageManifest
-Version: 0.1.1
-Image Name: example.com/reduce-worker
-Labels:
-  version -> 1.0.0
-  arch -> amd64
-  os -> linux
---- 8< ---
+$ ./bin/examples/validate_manifest container.json || echo fail
+$ ./bin/examples/validate_manifest container_bad.json || echo fail
+Container runtime manifest is invalid: "0.1 is not a valid semver 2.0 version string.", "UUID must be a rfc4122-formatted string."
+fail
+$
 ```
 
 
 ## Status
 
-Early, early (like really early) development. Most pieces are incomplete and require tests, build scripts need work, use of syntax is inconsistent, etc.
+Early, early (like really early) development. Most pieces are incomplete and require tests, build scripts need work, use of syntax likely inconsistent, etc.
 
 ## Contributing
 

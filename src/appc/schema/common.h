@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include "3rdparty/nlohmann/json.h"
 
 #include "appc/util/option.h"
@@ -97,6 +99,75 @@ struct StringType : Type<T> {
 
   static Json to_json(const T& string_type) {
     return string_type.value;
+  }
+};
+
+
+template<typename T>
+struct IntegerType : Type<T> {
+  // TODO hand-wavy
+  const int64_t value;
+
+  explicit IntegerType<T>(const double value)
+  : value(value) {}
+
+  bool operator==(const IntegerType<T>& other) const {
+    return value == other.value;
+  }
+
+  bool operator!=(const IntegerType<T>& other) const {
+    return !(*this == other);
+  }
+
+  operator int() const {
+    return value;
+  }
+
+  static Try<T> from_json(const Json& json) {
+    if (json.type() != Json::value_type::number) {
+      return Failure<T>("IntegerType must be intialized from JSON number type.");
+    }
+    return Result(T(json.get<int>()));
+  }
+
+  static Json to_json(const T& int_type) {
+    return int_type.value;
+  }
+};
+
+
+template<typename T>
+struct BooleanType : Type<T> {
+  const bool value;
+
+  explicit BooleanType<T>(const double value)
+  : value(value) {}
+
+  bool operator==(const BooleanType<T>& other) const {
+    return value == other.value;
+  }
+
+  bool operator!=(const BooleanType<T>& other) const {
+    return !(*this == other);
+  }
+
+  operator bool() const {
+    return value;
+  }
+
+  static Try<T> from_json(const Json& json) {
+    if (json.type() != Json::value_type::boolean) {
+      return Failure<T>("BooleanType must be intialized from JSON boolean type.");
+    }
+    return Result(T(json.get<bool>()));
+  }
+
+  static Json to_json(const T& int_type) {
+    return int_type.value;
+  }
+
+  virtual Status validate() const {
+    return Valid();
   }
 };
 

@@ -8,6 +8,7 @@
 #include "appc/schema/isolators.h"
 #include "appc/schema/mount_points.h"
 #include "appc/schema/path.h"
+#include "appc/schema/ports.h"
 #include "appc/schema/user.h"
 
 #include "appc/util/try.h"
@@ -26,7 +27,7 @@ struct App : Type<App> {
   const Option<Path> working_directory;
   //const Option<Environment> env;
   const Option<MountPoints> mount_points;
-  //const Option<Ports> ports;
+  const Option<Ports> ports;
   const Option<Isolators> isolators;
 
   explicit App(const Exec& exec,
@@ -36,7 +37,7 @@ struct App : Type<App> {
                const Option<Path>& working_directory,
                //const Environment& env,
                const Option<MountPoints>& mount_points,
-               //const Ports& ports,
+               const Option<Ports>& ports,
                const Option<Isolators>& isolators)
     : exec(exec),
       user(user),
@@ -45,7 +46,7 @@ struct App : Type<App> {
       working_directory(working_directory),
       //env(env),
       mount_points(mount_points),
-      //ports(ports),
+      ports(ports),
       isolators(isolators) {}
 
   static Try<App> from_json(const Json& json) {
@@ -73,7 +74,9 @@ struct App : Type<App> {
     const auto mount_points = OptionFromTry<MountPoints>([&json]() {
       return MountPoints::from_json(json[std::string{"mountPoints"}]);
     });
-    //Ports::from_json(json["ports"]),
+    const auto ports = OptionFromTry<Ports>([&json]() {
+      return Ports::from_json(json[std::string{"ports"}]);
+    });
     const auto isolators = OptionFromTry<Isolators>([&json]() {
       return Isolators::from_json(json[std::string{"isolators"}]);
     });
@@ -83,6 +86,7 @@ struct App : Type<App> {
                       event_handlers,
                       working_directory,
                       mount_points,
+                      ports,
                       isolators));
   }
 
@@ -94,6 +98,7 @@ struct App : Type<App> {
       validate_if_some(event_handlers),
       validate_if_some(working_directory),
       validate_if_some(mount_points),
+      validate_if_some(ports),
       validate_if_some(isolators)
     });
   }

@@ -88,6 +88,15 @@ int dumpAIM(const Json& json)
         }
       }
     }
+    if (app.ports) {
+      auto ports = *app.ports;
+      std::cout << "  Ports:" << std::endl;
+      for (auto& port : ports.array) {
+        std::cout << "    Name: " << port.name.value << std::endl;
+        std::cout << "    Number: " << port.port.value << std::endl;
+        std::cout << "    Protocol: " << port.protocol.value << std::endl;
+      }
+    }
     if (app.isolators) {
       auto isolators = *app.isolators;
       std::cout << "  Isolators:" << std::endl;

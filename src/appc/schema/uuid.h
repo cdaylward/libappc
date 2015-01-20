@@ -33,10 +33,10 @@ struct UUID : StringType<UUID> {
     const std::string hex_octet2{hex_octet + "{2}"};
     const std::string hex_octet4{hex_octet + "{4}"};
     const std::string hex_octet6{hex_octet + "{6}"};
-    const std::regex pattern(hex_octet4 + "-" + hex_octet2 + "-" +
+    const std::regex pattern("^" + hex_octet4 + "-" + hex_octet2 + "-" +
                              hex_octet2 + "-" +
                              hex_octet +
-                             hex_octet + "-" + hex_octet6,
+                             hex_octet + "-" + hex_octet6 + "$",
                              std::regex::ECMAScript);
     if (std::regex_match(value, pattern)) {
       return Valid();

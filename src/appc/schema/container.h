@@ -48,7 +48,7 @@ struct ContainerRuntimeManifest {
     const auto isolators = try_option_from_json<Isolators>(json, "isolators");
     const auto annotations = try_option_from_json<Annotations>(json, "annotations");
 
-    if (!SomeIfAll(ac_version, ac_kind, uuid, app_refs, volumes, isolators, annotations)) {
+    if (!all_results(ac_version, ac_kind, uuid, app_refs, volumes, isolators, annotations)) {
       return collect_failure_reasons<ContainerRuntimeManifest>(
         ac_version, ac_kind, uuid, app_refs, volumes, isolators, annotations);
     }

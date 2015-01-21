@@ -31,7 +31,7 @@ struct Dependency : Type<Dependency> {
     const auto image_id = try_option_from_json<ImageID>(json, "imageID");
     const auto labels = try_option_from_json<Labels>(json, "labels");
 
-    if (!SomeIfAll(app_name, image_id, labels)) {
+    if (!all_results(app_name, image_id, labels)) {
       return collect_failure_reasons<Dependency>(app_name, image_id, labels);
     }
     return Result(Dependency(*app_name,

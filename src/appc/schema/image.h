@@ -57,8 +57,8 @@ struct ImageManifest : Type<ImageManifest> {
     const auto path_whitelist = try_option_from_json<PathWhitelist>(json, "pathWhitelist");
     const auto annotations = try_option_from_json<Annotations>(json, "annotations");
 
-    if (!SomeIfAll(ac_kind, ac_version, name, labels, app,
-                   dependencies, path_whitelist, annotations)) {
+    if (!all_results(ac_kind, ac_version, name, labels, app,
+                     dependencies, path_whitelist, annotations)) {
       return collect_failure_reasons<ImageManifest>(ac_kind, ac_version, name, labels, app,
                                                     dependencies, path_whitelist, annotations);
     }

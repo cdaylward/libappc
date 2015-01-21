@@ -31,7 +31,7 @@ struct EventHandler : Type<EventHandler> {
     const auto exec = try_from_json<Exec>(json, "exec");
     const auto event_name = try_from_json<EventName>(json, "name");
 
-    if (!SomeIfAll(exec, event_name)) {
+    if (!all_results(exec, event_name)) {
       return collect_failure_reasons<EventHandler>(exec, event_name);
     }
 

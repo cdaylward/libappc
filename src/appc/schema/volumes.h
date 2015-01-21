@@ -68,7 +68,7 @@ struct Volume : Type<Volume> {
     const auto source = try_option_from_json<VolumeSource>(json, "source");
     const auto read_only = try_option_from_json<ReadOnly>(json, "readOnly");
 
-    if (!SomeIfAll(kind, fulfills, read_only, source)) {
+    if (!all_results(kind, fulfills, read_only, source)) {
       return collect_failure_reasons<Volume>(kind, fulfills, read_only, source);
     }
 

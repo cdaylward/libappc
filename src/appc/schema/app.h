@@ -62,8 +62,8 @@ struct App : Type<App> {
     const auto ports = try_option_from_json<Ports>(json, "ports");
     const auto isolators = try_option_from_json<Isolators>(json, "isolators");
 
-    if (!SomeIfAll(exec, user, group, event_handlers, working_directory, mount_points,
-                   ports, isolators)) {
+    if (!all_results(exec, user, group, event_handlers, working_directory, mount_points,
+                     ports, isolators)) {
       return collect_failure_reasons<App>(exec, user, group, event_handlers, working_directory,
                                           mount_points, ports, isolators);
     }

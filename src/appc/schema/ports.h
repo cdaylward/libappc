@@ -75,7 +75,7 @@ struct Port : Type<Port> {
 
     const auto socket_activated = try_option_from_json<SocketActivated>(json, "socketActivated");
 
-    if (!SomeIfAll(name, port, protocol, socket_activated)) {
+    if (!all_results(name, port, protocol, socket_activated)) {
       return collect_failure_reasons<Port>(name, port, protocol, socket_activated);
     }
     return Result(Port(*name,

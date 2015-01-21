@@ -36,7 +36,7 @@ struct AppRef : Type<AppRef> {
     const auto isolators = try_option_from_json<Isolators>(json, "isolators");
     const auto annotations = try_option_from_json<Annotations>(json, "annotations");
 
-    if (!SomeIfAll(image_id, app_name, isolators, annotations)) {
+    if (!all_results(image_id, app_name, isolators, annotations)) {
       return collect_failure_reasons<AppRef>(image_id, app_name, isolators, annotations);
     }
 

@@ -4,6 +4,7 @@
 
 #include "appc/schema/common.h"
 #include "appc/schema/ac_name.h"
+#include "appc/schema/try_json.h"
 
 #include "appc/util/try.h"
 #include "appc/util/try_option.h"
@@ -68,25 +69,19 @@ struct Port : Type<Port> {
     socket_activated(socket_activated) {}
 
   static Try<Port> from_json(const Json& json) {
-    const auto name = TryFlatten<PortName>([&json]() {
-      return PortName::from_json(json[std::string{"name"}]);
-    });
-    const auto port = TryFlatten<PortNumber>([&json]() {
-      return PortNumber::from_json(json[std::string{"port"}]);
-    });
-    const auto protocol = TryFlatten<Protocol>([&json]() {
-      return Protocol::from_json(json[std::string{"protocol"}]);
-    });
-    if (!SomeIfAll(name, port, protocol)) {
-      return collect_failure_reasons<Port>(name, port, protocol);
+    const auto name = try_from_json<PortName>(json, "name");
+    const auto port = try_from_json<PortNumber>(json, "port");
+    const auto protocol = try_from_json<Protocol>(json, "protocol");
+
+    const auto socket_activated = try_option_from_json<SocketActivated>(json, "socketActivated");
+
+    if (!SomeIfAll(name, port, protocol, socket_activated)) {
+      return collect_failure_reasons<Port>(name, port, protocol, socket_activated);
     }
-    const auto socket_activated = OptionFromTry<SocketActivated>([&json]() {
-      return SocketActivated::from_json(json[std::string{"socketActivated"}]);
-    });
     return Result(Port(*name,
                        *port,
                        *protocol,
-                       socket_activated));
+                       *socket_activated));
   }
 
   Status validate() const {

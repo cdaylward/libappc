@@ -9,9 +9,11 @@
 #include "appc/schema/labels.h"
 #include "appc/schema/path.h"
 #include "appc/schema/path_whitelist.h"
+#include "appc/schema/try_json.h"
 
 #include "appc/util/try.h"
 #include "appc/util/try_option.h"
+
 
 namespace appc {
 namespace schema {
@@ -45,44 +47,30 @@ struct ImageManifest : Type<ImageManifest> {
     annotations(annotations) {}
 
   static Try<ImageManifest> from_json(const Json& json) {
-    const auto ac_kind = TryFlatten<AcKind>([&json]() {
-      return AcKind::from_json(json[std::string{"acKind"}]);
-    });
-    const auto ac_version = TryFlatten<AcVersion>([&json]() {
-      return AcVersion::from_json(json[std::string{"acVersion"}]);
-    });
-    const auto name = TryFlatten<AppName>([&json]() {
-      return AppName::from_json(json[std::string{"name"}]);
-    });
+    const auto ac_kind = try_from_json<AcKind>(json, "acKind");
+    const auto ac_version = try_from_json<AcVersion>(json, "acVersion");
+    const auto name = try_from_json<AppName>(json, "name");
 
-    if (!SomeIfAll(ac_kind, ac_version, name)) {
-      return collect_failure_reasons<ImageManifest>(ac_kind, ac_version, name);
+    const auto labels = try_option_from_json<Labels>(json, "labels");
+    const auto app = try_option_from_json<App>(json, "app");
+    const auto dependencies = try_option_from_json<Dependencies>(json, "dependencies");
+    const auto path_whitelist = try_option_from_json<PathWhitelist>(json, "pathWhitelist");
+    const auto annotations = try_option_from_json<Annotations>(json, "annotations");
+
+    if (!SomeIfAll(ac_kind, ac_version, name, labels, app,
+                   dependencies, path_whitelist, annotations)) {
+      return collect_failure_reasons<ImageManifest>(ac_kind, ac_version, name, labels, app,
+                                                    dependencies, path_whitelist, annotations);
     }
-
-    const auto labels = OptionFromTry<Labels>([&json]() {
-      return Labels::from_json(json[std::string{"labels"}]);
-    });
-    const auto app = OptionFromTry<App>([&json]() {
-      return App::from_json(json[std::string{"app"}]);
-    });
-    const auto dependencies = OptionFromTry<Dependencies>([&json]() {
-      return Dependencies::from_json(json[std::string{"dependencies"}]);
-    });
-    const auto path_whitelist = OptionFromTry<PathWhitelist>([&json]() {
-      return PathWhitelist::from_json(json[std::string{"pathWhitelist"}]);
-    });
-    const auto annotations = OptionFromTry<Annotations>([&json]() {
-      return Annotations::from_json(json[std::string{"annotations"}]);
-    });
 
     return Result(ImageManifest(*ac_kind,
                                 *ac_version,
                                 *name,
-                                labels,
-                                app,
-                                dependencies,
-                                path_whitelist,
-                                annotations));
+                                *labels,
+                                *app,
+                                *dependencies,
+                                *path_whitelist,
+                                *annotations));
   }
 
   Status validate() const {

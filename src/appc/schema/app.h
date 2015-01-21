@@ -9,6 +9,7 @@
 #include "appc/schema/mount_points.h"
 #include "appc/schema/path.h"
 #include "appc/schema/ports.h"
+#include "appc/schema/try_json.h"
 #include "appc/schema/user.h"
 
 #include "appc/util/try.h"
@@ -50,44 +51,31 @@ struct App : Type<App> {
       isolators(isolators) {}
 
   static Try<App> from_json(const Json& json) {
-    const auto exec = TryFlatten<Exec>([&json]() {
-      return Exec::from_json(json[std::string{"exec"}]);
-    });
-    const auto user = TryFlatten<User>([&json]() {
-      return User::from_json(json[std::string{"user"}]);
-    });
-    const auto group = TryFlatten<Group>([&json]() {
-      return Group::from_json(json[std::string{"group"}]);
-    });
+    const auto exec = try_from_json<Exec>(json, "exec");
+    const auto user = try_from_json<User>(json, "user");
+    const auto group = try_from_json<Group>(json, "group");
 
-    if (!SomeIfAll(exec, user, group)) {
-      return collect_failure_reasons<App>(exec, user, group);
+    const auto event_handlers = try_option_from_json<EventHandlers>(json, "eventHandlers");
+    const auto working_directory = try_option_from_json<Path>(json, "workingDirectory");
+    //Environment::from_json(json["environment"]),
+    const auto mount_points = try_option_from_json<MountPoints>(json, "mountPoints");
+    const auto ports = try_option_from_json<Ports>(json, "ports");
+    const auto isolators = try_option_from_json<Isolators>(json, "isolators");
+
+    if (!SomeIfAll(exec, user, group, event_handlers, working_directory, mount_points,
+                   ports, isolators)) {
+      return collect_failure_reasons<App>(exec, user, group, event_handlers, working_directory,
+                                          mount_points, ports, isolators);
     }
 
-    const auto event_handlers = OptionFromTry<EventHandlers>([&json]() {
-      return EventHandlers::from_json(json[std::string{"eventHandlers"}]);
-    });
-    const auto working_directory = OptionFromTry<Path>([&json]() {
-      return Path::from_json(json[std::string{"workingDirectory"}]);
-    });
-    //Environment::from_json(json["environment"]),
-    const auto mount_points = OptionFromTry<MountPoints>([&json]() {
-      return MountPoints::from_json(json[std::string{"mountPoints"}]);
-    });
-    const auto ports = OptionFromTry<Ports>([&json]() {
-      return Ports::from_json(json[std::string{"ports"}]);
-    });
-    const auto isolators = OptionFromTry<Isolators>([&json]() {
-      return Isolators::from_json(json[std::string{"isolators"}]);
-    });
     return Result(App(*exec,
                       *user,
                       *group,
-                      event_handlers,
-                      working_directory,
-                      mount_points,
-                      ports,
-                      isolators));
+                      *event_handlers,
+                      *working_directory,
+                      *mount_points,
+                      *ports,
+                      *isolators));
   }
 
   Status validate() const {

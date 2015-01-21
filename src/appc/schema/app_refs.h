@@ -4,6 +4,8 @@
 #include "appc/schema/image_id.h"
 #include "appc/schema/app_name.h"
 #include "appc/schema/isolators.h"
+#include "appc/schema/try_json.h"
+
 #include "appc/util/try_option.h"
 
 
@@ -28,28 +30,20 @@ struct AppRef : Type<AppRef> {
     annotations(annotations) {}
 
   static Try<AppRef> from_json(const Json& json) {
-    const auto image_id = TryFlatten<ImageID>([&json]() {
-      return ImageID::from_json(json[std::string{"imageID"}]);
-    });
+    const auto image_id = try_from_json<ImageID>(json, "imageID");
 
-    if (!image_id) {
-      return Failure<AppRef>("An app requires an imageID.");
+    const auto app_name = try_option_from_json<AppName>(json, "app");
+    const auto isolators = try_option_from_json<Isolators>(json, "isolators");
+    const auto annotations = try_option_from_json<Annotations>(json, "annotations");
+
+    if (!SomeIfAll(image_id, app_name, isolators, annotations)) {
+      return collect_failure_reasons<AppRef>(image_id, app_name, isolators, annotations);
     }
 
-    const auto app_name = OptionFromTry<AppName>([&json]() {
-      return AppName::from_json(json[std::string{"app"}]);
-    });
-    const auto isolators = OptionFromTry<Isolators>([&json]() {
-      return Isolators::from_json(json[std::string{"isolators"}]);
-    });
-    const auto annotations = OptionFromTry<Annotations>([&json]() {
-      return Annotations::from_json(json[std::string{"annotations"}]);
-    });
-
     return Result(AppRef(*image_id,
-                         app_name,
-                         isolators,
-                         annotations));
+                         *app_name,
+                         *isolators,
+                         *annotations));
   }
 
   Status validate() const {

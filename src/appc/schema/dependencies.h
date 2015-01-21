@@ -3,6 +3,7 @@
 #include "appc/schema/app_name.h"
 #include "appc/schema/image_id.h"
 #include "appc/schema/labels.h"
+#include "appc/schema/try_json.h"
 
 #include "appc/util/try.h"
 #include "appc/util/try_option.h"
@@ -25,21 +26,17 @@ struct Dependency : Type<Dependency> {
     labels(labels) {}
 
   static Try<Dependency> from_json(const Json& json) {
-    const auto app_name = TryFlatten<AppName>([&json]() {
-      return AppName::from_json(json[std::string{"app"}]);
-    });
-    if (!app_name) {
-      return Failure<Dependency>("A dependency requires an 'app'");
+    const auto app_name = try_from_json<AppName>(json, "app");
+
+    const auto image_id = try_option_from_json<ImageID>(json, "imageID");
+    const auto labels = try_option_from_json<Labels>(json, "labels");
+
+    if (!SomeIfAll(app_name, image_id, labels)) {
+      return collect_failure_reasons<Dependency>(app_name, image_id, labels);
     }
-    const auto image_id = OptionFromTry<ImageID>([&json]() {
-      return ImageID::from_json(json[std::string{"imageID"}]);
-    });
-    const auto labels = OptionFromTry<Labels>([&json]() {
-      return Labels::from_json(json[std::string{"labels"}]);
-    });
     return Result(Dependency(*app_name,
-                             image_id,
-                             labels));
+                             *image_id,
+                             *labels));
   }
 
   Status validate() const {

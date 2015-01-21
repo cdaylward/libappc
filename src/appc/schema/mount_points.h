@@ -7,6 +7,7 @@ namespace appc {
 namespace schema {
 
 
+// TODO cleanup, types
 struct MountPoint : Type<MountPoint> {
   const std::string name;
   const std::string path;

@@ -1,17 +1,13 @@
 #pragma once
 
 #include "appc/schema/common.h"
+#include "appc/schema/try_json.h"
 
 
 namespace appc {
 namespace schema {
 
 using ReadOnly = bool;
-
-const std::string fulfills_field{"fulfills"};
-const std::string kind_field{"kind"};
-const std::string source_field{"source"};
-const std::string read_only_field{"readOnly"};
 
 
 struct VolumeKind : StringType<VolumeKind> {
@@ -67,20 +63,16 @@ struct Volume : Type<Volume> {
     read_only(read_only) {}
 
   static Try<Volume> from_json(const Json& json) {
-    const auto kind = TryFlatten<VolumeKind>([&json]() {
-      return VolumeKind::from_json(json[kind_field]);
-    });
-    const auto fulfills = TryFlatten<MountPointNames>([&json]() {
-      return MountPointNames::from_json(json[fulfills_field]);
+    const auto kind = try_from_json<VolumeKind>(json, "kind");
+    const auto fulfills = try_from_json<MountPointNames>(json, "fulfills");
+
+    const auto read_only_try = TryFrom<bool>([&json]() {
+      return json[std::string{"readOnly"}].get<bool>();
     });
 
     if (!SomeIfAll(kind, fulfills)) {
       return collect_failure_reasons<Volume>(kind, fulfills);
     }
-
-    const auto read_only_try = TryFrom<bool>([&json]() {
-      return json[read_only_field].get<bool>();
-    });
 
     ReadOnly read_only{false};
     if (read_only_try) {
@@ -88,9 +80,7 @@ struct Volume : Type<Volume> {
     }
 
     if (kind->value == "host") {
-      const auto source = TryFlatten<VolumeSource>([&json]() {
-        return VolumeSource::from_json(json[source_field]);
-      });
+      const auto source = try_from_json<VolumeSource>(json, "source");
       return Result(Volume(*kind,
                            *fulfills,
                            *source,

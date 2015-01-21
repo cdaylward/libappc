@@ -7,6 +7,7 @@
 #include "appc/schema/isolators.h"
 #include "appc/schema/uuid.h"
 #include "appc/schema/volumes.h"
+#include "appc/schema/try_json.h"
 
 
 namespace appc {
@@ -38,41 +39,28 @@ struct ContainerRuntimeManifest {
       annotations(annotations) {}
 
   static Try<ContainerRuntimeManifest> from_json(const Json& json) {
-    const auto ac_version = TryFlatten<AcVersion>([&json]() {
-      return AcVersion::from_json(json[std::string{"acVersion"}]);
-    });
-    const auto ac_kind = TryFlatten<AcKind>([&json]() {
-      return AcKind::from_json(json[std::string{"acKind"}]);
-    });
-    const auto uuid = TryFlatten<UUID>([&json]() {
-      return UUID::from_json(json[std::string{"uuid"}]);
-    });
-    const auto app_refs = TryFlatten<AppRefs>([&json]() {
-      return AppRefs::from_json(json[std::string{"apps"}]);
-    });
+    const auto ac_version = try_from_json<AcVersion>(json, "acVersion");
+    const auto ac_kind = try_from_json<AcKind>(json, "acKind");
+    const auto uuid = try_from_json<UUID>(json, "uuid");
+    const auto app_refs = try_from_json<AppRefs>(json, "apps");
 
-    if (!SomeIfAll(ac_version, ac_kind, uuid, app_refs)) {
-      return collect_failure_reasons<ContainerRuntimeManifest>(ac_version, ac_kind, uuid, app_refs);
+    const auto volumes = try_option_from_json<Volumes>(json, "volumes");
+    const auto isolators = try_option_from_json<Isolators>(json, "isolators");
+    const auto annotations = try_option_from_json<Annotations>(json, "annotations");
+
+    if (!SomeIfAll(ac_version, ac_kind, uuid, app_refs, volumes, isolators, annotations)) {
+      return collect_failure_reasons<ContainerRuntimeManifest>(
+        ac_version, ac_kind, uuid, app_refs, volumes, isolators, annotations);
     }
-
-    const auto volumes = OptionFromTry<Volumes>([&json]() {
-      return Volumes::from_json(json[std::string{"volumes"}]);
-    });
-    const auto isolators = OptionFromTry<Isolators>([&json]() {
-      return Isolators::from_json(json[std::string{"isolators"}]);
-    });
-    const auto annotations = OptionFromTry<Annotations>([&json]() {
-      return Annotations::from_json(json[std::string{"annotations"}]);
-    });
 
     return Result(ContainerRuntimeManifest(
         *ac_version,
         *ac_kind,
         *uuid,
         *app_refs,
-        volumes,
-        isolators,
-        annotations));
+        *volumes,
+        *isolators,
+        *annotations));
   }
 
   Status validate() const {

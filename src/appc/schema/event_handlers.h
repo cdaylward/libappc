@@ -1,21 +1,20 @@
 #pragma once
 
+#include "appc/schema/ac_name.h"
 #include "appc/schema/common.h"
 #include "appc/schema/exec.h"
+#include "appc/schema/try_json.h"
+
+#include "appc/util/try_option.h"
 
 
 namespace appc {
 namespace schema {
 
 
-struct EventName : StringType<EventName> {
+struct EventName : ACName<EventName> {
   explicit EventName(const std::string& name)
-  : StringType<EventName>(name) {}
-
-  Status validate() const {
-    // TODO(cdaylward)
-    return Valid();
-  }
+  : ACName<EventName>(name) {}
 };
 
 
@@ -29,18 +28,19 @@ struct EventHandler : Type<EventHandler> {
     exec(exec) {}
 
   static Try<EventHandler> from_json(const Json& json) {
-    if (json.type() != Json::value_type::object) {
-      return Failure<EventHandler>("EventHandler must be built from JSON object");
+    const auto exec = try_from_json<Exec>(json, "exec");
+    const auto event_name = try_from_json<EventName>(json, "name");
+
+    if (!SomeIfAll(exec, event_name)) {
+      return collect_failure_reasons<EventHandler>(exec, event_name);
     }
-    // TODO check these
-    const Try<Exec> exec { Exec::from_json(json[std::string{"exec"}]) };
-    const Try<EventName> eventName { EventName::from_json(json[std::string{"name"}]) };
-    return Result(EventHandler(*eventName,
+
+    return Result(EventHandler(*event_name,
                                *exec));
   }
 
   Status validate() const {
-    return Valid();
+    return name.validate();
   }
 };
 

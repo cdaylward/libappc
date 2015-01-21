@@ -1,13 +1,12 @@
 #pragma once
 
 #include "appc/schema/common.h"
+#include "appc/schema/mount_points.h"
 #include "appc/schema/try_json.h"
 
 
 namespace appc {
 namespace schema {
-
-using ReadOnly = bool;
 
 
 struct VolumeKind : StringType<VolumeKind> {
@@ -50,13 +49,13 @@ struct VolumeSource : StringType<VolumeSource> {
 struct Volume : Type<Volume> {
   const VolumeKind kind;
   const MountPointNames fulfills;
-  const VolumeSource source;
-  const ReadOnly read_only;
+  const Option<VolumeSource> source;
+  const Option<ReadOnly> read_only;
 
   explicit Volume(const VolumeKind& kind,
                   const MountPointNames& fulfills,
-                  const VolumeSource& source,
-                  const ReadOnly read_only)
+                  const Option<VolumeSource>& source,
+                  const Option<ReadOnly>& read_only)
   : kind(kind),
     fulfills(fulfills),
     source(source),
@@ -66,37 +65,32 @@ struct Volume : Type<Volume> {
     const auto kind = try_from_json<VolumeKind>(json, "kind");
     const auto fulfills = try_from_json<MountPointNames>(json, "fulfills");
 
-    const auto read_only_try = TryFrom<bool>([&json]() {
-      return json[std::string{"readOnly"}].get<bool>();
-    });
+    const auto source = try_option_from_json<VolumeSource>(json, "source");
+    const auto read_only = try_option_from_json<ReadOnly>(json, "readOnly");
 
-    if (!SomeIfAll(kind, fulfills)) {
-      return collect_failure_reasons<Volume>(kind, fulfills);
-    }
-
-    ReadOnly read_only{false};
-    if (read_only_try) {
-      read_only = *read_only_try;
-    }
-
-    if (kind->value == "host") {
-      const auto source = try_from_json<VolumeSource>(json, "source");
-      return Result(Volume(*kind,
-                           *fulfills,
-                           *source,
-                           read_only));
+    if (!SomeIfAll(kind, fulfills, read_only, source)) {
+      return collect_failure_reasons<Volume>(kind, fulfills, read_only, source);
     }
 
     return Result(Volume(*kind,
                          *fulfills,
-                         VolumeSource(""),
-                         read_only));
+                         *source,
+                         *read_only));
   }
 
   Status validate() const {
+    Status host_has_source = [this] {
+      if (kind.value == "host" && !source) {
+        return Invalid("volume must have source if kind is host");
+      };
+      return Valid();
+    }();
     return collect_status({
       kind.validate(),
-      fulfills.validate()
+      fulfills.validate(),
+      validate_if_some(source),
+      validate_if_some(read_only),
+      host_has_source
     });
   }
 };

@@ -248,7 +248,7 @@ struct NameValueType : Type<T> {
       return Result(T(json[std::string{"name"}].get<std::string>(),
                       json[std::string{"value"}].get<std::string>()));
     } catch (const std::exception& err) {
-      return Failure<T>(err.what());
+      return Failure<T>("NameValue must be a {\"name\": \"<name>\", \"value\": \"<value>\" } object: " + std::string{err.what()});
     }
     return Failure<T>("NameValue must be a {\"name\": \"<name>\", \"value\": \"<value>\" } object.");
   }

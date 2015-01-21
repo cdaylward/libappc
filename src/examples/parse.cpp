@@ -108,9 +108,9 @@ int dumpAIM(const Json& json)
       auto mount_points = *app.mount_points;
       std::cout << "  Mount Points:" << std::endl;
       for (auto& mount : mount_points.array) {
-        std::cout << "    " << mount.name << std::endl;
-        std::cout << "      Path: " << mount.path << std::endl;
-        std::cout << "      Read Only: " << mount.readOnly << std::endl;
+        std::cout << "    " << mount.name.value << std::endl;
+        std::cout << "      Path: " << mount.path.value << std::endl;
+        std::cout << "      Read Only: " << mount.read_only << std::endl;
       }
     }
   }

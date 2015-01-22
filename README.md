@@ -2,7 +2,7 @@
 
 ## Overview
 
-A C++ library for doing things with [App Containers](https://github.com/appc/spec). The goal of the libary is to be a flexible toolkit: manifest parsing and creation, pluggable discovery, image creation/extraction/caching, thin-provisioned file systems, etc. Configuration and data interchange will almost always be JSON. Some or all pieces may be used, just use the headers you require.
+A C++ library for doing things with [App Containers](https://github.com/appc/spec). The goal of the libary is to be a flexible toolkit: manifest parsing and creation, pluggable discovery, image creation / extraction / caching, thin-provisioned file systems, etc...not a particular [ACE](https://github.com/appc/spec/blob/master/SPEC.md#app-container-executor) implementation. In other words, the goal is that you can use it to make one. Some or all pieces may be used, just use the headers you require.
 
 ## Getting Started
 
@@ -28,14 +28,27 @@ Build the examples:
 
 ## Examples
 
-Example code is located in src/examples. build.sh will build them and place them in bin/examples, e.g.
+Example code is located in src/examples. Run `build.sh` and the examples will be built in bin/examples, e.g.
 
 ```
-$ ./bin/examples/validate_manifest container.json || echo fail
-$ ./bin/examples/validate_manifest container_bad.json || echo fail
-Container runtime manifest is invalid: "0.1 is not a valid semver 2.0 version string.", "UUID must be a rfc4122-formatted string."
-fail
-$
+$ ./build.sh
+[ 36%] Built target _get_gtest
+[ 72%] Built target _get_libarchive
+[ 77%] Built target gtest
+[ 81%] Built target gtest_main
+[ 86%] Built target generate_complete_crm
+[ 90%] Built target generate_minimal_crm
+[ 95%] Built target parse
+[100%] Built target validate
+$ ./bin/examples/schema/generate_complete_crm > /tmp/container.json
+$ ./bin/examples/schema/validate /tmp/container.json || echo invalid
+$ ./bin/examples/schema/parse /tmp/container.json
+Kind: ContainerRuntimeManifest
+Version: 0.2.0
+UUID: 0F426158-97EE-49F8-B4A3-792ECDA926FB
+--- 8< ---
+$ ./bin/examples/schema/validate image_bad.json
+Invalid Manifest: "imageID must be <hash name>-<hex representation> format"
 ```
 
 

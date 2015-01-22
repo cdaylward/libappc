@@ -24,7 +24,7 @@ struct ACName : StringType<T> {
     if (this->value.size() > max_ac_name_length) {
       return Invalid("ACName must not be longer than " + max_ac_name_length);
     }
-    const std::regex pattern("^[a-z0-9]+([a-z0-9-\\./]*[a-z0-9])*$",
+    const std::regex pattern("^[A-Za-z0-9]+([\\-\\.\\/][A-Za-z0-9]+)*$",
                              std::regex::ECMAScript);
     if (!std::regex_match(this->value, pattern)) {
       return Invalid("ACName must comply with rfc1123 + allow '/'");

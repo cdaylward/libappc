@@ -9,13 +9,13 @@
 
 
 using Json = nlohmann::json;
+using namespace appc::schema;
 
-int dumpAIM(const Json& json);
-int dumpCRM(const Json& json);
+static Status dump_CRM(const ContainerRuntimeManifest& container);
+static Status dump_IM(const ImageManifest& image);
 
 
-// There isn't any real point to dumpAIM and dumpCRM other than anillustration of how to parse
-// and access a manifest.
+// This has no real utility outside of illustrating how to parse and access a manifest.
 int main(int args, char** argv) {
   if (args < 2) {
     std::cerr << "Usage: " << argv[0] << " <image or container manifest to parse>" << std::endl;
@@ -31,49 +31,128 @@ int main(int args, char** argv) {
   buffer << f.rdbuf();
   std::string json_str { buffer.str() };
 
-  // Will throw invalid_argument if not valid JSON
-  Json manifest = Json::parse(json_str);
+  Json json;
+  try {
+    // invalid_argument is thrown in JSON is malformed.
+    json = Json::parse(json_str);
+  } catch (const std::invalid_argument& err) {
+    std::cerr << err.what() << std::endl;
+    return EXIT_FAILURE;
+  }
 
-  if (manifest["acKind"] == "ContainerRuntimeManifest") {
-    return dumpCRM(manifest);
-  }
-  else if (manifest["acKind"] == "ImageManifest") {
-    return dumpAIM(manifest);
-  }
-  else {
-    std::cerr << "Unknown manifest type." << std::endl;
+  // In practice, you would not need to switch based on the kind as done here, you would know
+  // the manifest type a priori.
+  const std::string kind = json[std::string{"acKind"}];
+
+  Status valid = [&kind, &json]() {
+    if (kind == "ContainerRuntimeManifest") {
+      auto manifest_try = ContainerRuntimeManifest::from_json(json);
+      return manifest_try ? dump_CRM(*manifest_try) : Invalid(manifest_try.failure_reason());
+    }
+    else if (kind == "ImageManifest") {
+      auto manifest_try = ImageManifest::from_json(json);
+      return manifest_try ? dump_IM(*manifest_try) : Invalid(manifest_try.failure_reason());
+    }
+    return Invalid("Unknown manifest kind: " + kind);
+  }();
+
+  if (!valid) {
+    std::cerr << "Invalid Manifest: " << valid.message << std::endl;
     return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;
 }
 
-int dumpAIM(const Json& json)
+
+static Status dump_CRM(const ContainerRuntimeManifest& container)
 {
-  auto manifest_try = appc::schema::ImageManifest::from_json(json);
-  if (!manifest_try) {
-    std::cerr << "Could not parse manifest: " << std::endl;
-    std::cerr << manifest_try.failure_reason() << std::endl;
-    return EXIT_FAILURE;
+  auto valid = container.validate();
+  if (!valid) return valid;
+
+  std::cout << "Kind: " << container.ac_kind.value << std::endl;
+  std::cout << "Version: " << container.ac_version.value << std::endl;
+  std::cout << "UUID: " << container.uuid.value << std::endl;
+  std::cout << "Apps:" << std::endl;
+  for (auto& app : container.app_refs) {
+    std::cout << "    ImageID: " << app.image_id.value << std::endl;
+    if (app.app_name) {
+      std::cout << "      App: " << app.app_name->value << std::endl;
+    }
+    std::cout << "      Isolators:" << std::endl;
+    if (app.isolators) {
+      auto& isolators = *app.isolators;
+      for (auto& isolator : isolators) {
+        std::cout << "        " << isolator.name << " -> " << isolator.value << std::endl;
+      }
+    }
+    std::cout << "      Annotations:" << std::endl;
+    if (app.annotations) {
+      auto& annotations = *app.annotations;
+      for (auto& annotation : annotations) {
+        std::cout << "        " << annotation.name << " -> " << annotation.value << std::endl;
+      }
+    }
+  }
+  if (container.volumes) {
+    auto volumes = *container.volumes;
+    std::cout << "Volumes:" << std::endl;
+    for (auto& volume : volumes) {
+      std::cout << "  Kind: " << volume.kind.value << std::endl;
+      std::cout << "  Fulfills: " << std::endl;
+      for (auto& target : volume.fulfills) {
+        std::cout << "    " << target.value << std::endl;
+      }
+    }
+  }
+  else {
+    std::cout << "No Volumes" << std::endl;
+  }
+  if (container.isolators) {
+    auto isolators = *container.isolators;
+    std::cout << "Isolators:" << std::endl;
+    for (auto& isolator : isolators) {
+      std::cout << "  " << isolator.name << " -> " << isolator.value << std::endl;
+    }
+  }
+  else {
+    std::cout << "No Isolators" << std::endl;
+  }
+  if (container.annotations) {
+    auto annotations = *container.annotations;
+    std::cout << "Annotations:" << std::endl;
+    for (auto& annotation : annotations) {
+      std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;
+    }
+  }
+  else {
+    std::cout << "No Annotations" << std::endl;
   }
 
-  appc::schema::ImageManifest manifest = *manifest_try;
+  return Valid();
+}
 
-  std::cout << "Kind: " << manifest.ac_kind.value << std::endl;
-  std::cout << "Version: " << manifest.ac_version.value << std::endl;
-  std::cout << "Name: " << manifest.name.value << std::endl;
-  if (manifest.labels) {
-    auto labels = *manifest.labels;
+
+static Status dump_IM(const ImageManifest& image)
+{
+  auto valid = image.validate();
+  if (!valid) return valid;
+
+  std::cout << "Kind: " << image.ac_kind.value << std::endl;
+  std::cout << "Version: " << image.ac_version.value << std::endl;
+  std::cout << "Name: " << image.name.value << std::endl;
+  if (image.labels) {
+    auto labels = *image.labels;
     std::cout << "Labels:" << std::endl;
-    for (auto& label : labels.array) {
+    for (auto& label : labels) {
       std::cout << "  " << label.name << " -> " << label.value << std::endl;
     }
   }
-  if (manifest.app) {
-    auto app = *manifest.app;
+  if (image.app) {
+    auto app = *image.app;
     std::cout << "App:" << std::endl;
     std::cout << "  Exec:" << std::endl;
-    for (auto& arg : app.exec.array) {
+    for (auto& arg : app.exec) {
       std::cout << "    " << arg.value << std::endl;
     }
     std::cout << "  User: " << app.user.value << std::endl;
@@ -81,9 +160,9 @@ int dumpAIM(const Json& json)
     if (app.event_handlers) {
       auto event_handlers = *app.event_handlers;
       std::cout << "  Event Handlers:" << std::endl;
-      for (auto& handler : event_handlers.array) {
+      for (auto& handler : event_handlers) {
         std::cout << "    " << handler.name.value << std::endl;
-        for (auto& arg : handler.exec.array) {
+        for (auto& arg : handler.exec) {
         std::cout << "      " << arg.value << std::endl;
         }
       }
@@ -91,7 +170,7 @@ int dumpAIM(const Json& json)
     if (app.ports) {
       auto ports = *app.ports;
       std::cout << "  Ports:" << std::endl;
-      for (auto& port : ports.array) {
+      for (auto& port : ports) {
         std::cout << "    Name: " << port.name.value << std::endl;
         std::cout << "    Number: " << port.port.value << std::endl;
         std::cout << "    Protocol: " << port.protocol.value << std::endl;
@@ -100,24 +179,24 @@ int dumpAIM(const Json& json)
     if (app.isolators) {
       auto isolators = *app.isolators;
       std::cout << "  Isolators:" << std::endl;
-      for (auto& isolator : isolators.array) {
+      for (auto& isolator : isolators) {
         std::cout << "    " << isolator.name << " -> " << isolator.value << std::endl;
       }
     }
     if (app.mount_points) {
       auto mount_points = *app.mount_points;
       std::cout << "  Mount Points:" << std::endl;
-      for (auto& mount : mount_points.array) {
+      for (auto& mount : mount_points) {
         std::cout << "    " << mount.name.value << std::endl;
         std::cout << "      Path: " << mount.path.value << std::endl;
         std::cout << "      Read Only: " << mount.read_only << std::endl;
       }
     }
   }
-  if (manifest.dependencies) {
-    auto dependencies = *manifest.dependencies;
+  if (image.dependencies) {
+    auto dependencies = *image.dependencies;
     std::cout << "Dependencies:" << std::endl;
-    for (auto& dep : dependencies.array) {
+    for (auto& dep : dependencies) {
       std::cout << "  " << dep.app_name.value << std::endl;
       if (dep.image_id) {
         auto image_id = *dep.image_id;
@@ -126,105 +205,26 @@ int dumpAIM(const Json& json)
       if (dep.labels) {
         auto labels = *dep.labels;
         std::cout << "    Labels:" << std::endl;
-        for (auto& label : labels.array) {
+        for (auto& label : labels) {
           std::cout << "      " << label.name << " -> " << label.value << std::endl;
         }
       }
     }
   }
-  if (manifest.path_whitelist) {
-    auto path_whitelist = *manifest.path_whitelist;
+  if (image.path_whitelist) {
+    auto path_whitelist = *image.path_whitelist;
     std::cout << "Path Whitelist:" << std::endl;
-    for (auto& path : path_whitelist.array) {
+    for (auto& path : path_whitelist) {
       std::cout << "  " << path.value << std::endl;
     }
   }
-  if (manifest.annotations) {
-    auto annotations = *manifest.annotations;
+  if (image.annotations) {
+    auto annotations = *image.annotations;
     std::cout << "Annotations:" << std::endl;
-    for (auto& annotation : annotations.array) {
+    for (auto& annotation : annotations) {
       std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;
     }
   }
 
-  return EXIT_SUCCESS;
-}
-
-int dumpCRM(const Json& json)
-{
-  auto manifest_try = appc::schema::ContainerRuntimeManifest::from_json(json);
-  if (!manifest_try) {
-    std::cerr << "Could not parse manifest: " << std::endl;
-    std::cerr << manifest_try.failure_reason() << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  appc::schema::ContainerRuntimeManifest manifest = *manifest_try;
-
-  auto valid = manifest.validate();
-
-  if (!valid) {
-    std::cerr << "Manifest is invalid: " << valid.message << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  std::cout << "Kind: " << manifest.ac_kind.value << std::endl;
-  std::cout << "Version: " << manifest.ac_version.value << std::endl;
-  std::cout << "UUID: " << manifest.uuid.value << std::endl;
-  std::cout << "Apps:" << std::endl;
-  for (auto& app : manifest.app_refs.array) {
-    std::cout << "    ImageID: " << app.image_id.value << std::endl;
-    if (app.app_name) {
-      std::cout << "      App: " << app.app_name->value << std::endl;
-    }
-    std::cout << "      Isolators:" << std::endl;
-    if (app.isolators) {
-      auto& isolators = *app.isolators;
-      for (auto& isolator : isolators.array) {
-        std::cout << "        " << isolator.name << " -> " << isolator.value << std::endl;
-      }
-    }
-    std::cout << "      Annotations:" << std::endl;
-    if (app.annotations) {
-      auto& annotations = *app.annotations;
-      for (auto& annotation : annotations.array) {
-        std::cout << "        " << annotation.name << " -> " << annotation.value << std::endl;
-      }
-    }
-  }
-  if (manifest.volumes) {
-    auto volumes = *manifest.volumes;
-    std::cout << "Volumes:" << std::endl;
-    for (auto& volume : volumes.array) {
-      std::cout << "  Kind: " << volume.kind.value << std::endl;
-      std::cout << "  Fulfills: " << std::endl;
-      for (auto& target : volume.fulfills.array) {
-        std::cout << "    " << target.value << std::endl;
-      }
-    }
-  }
-  else {
-    std::cout << "No Volumes" << std::endl;
-  }
-  if (manifest.isolators) {
-    auto isolators = *manifest.isolators;
-    std::cout << "Isolators:" << std::endl;
-    for (auto& isolator : isolators.array) {
-      std::cout << "  " << isolator.name << " -> " << isolator.value << std::endl;
-    }
-  }
-  else {
-    std::cout << "No Isolators" << std::endl;
-  }
-  if (manifest.annotations) {
-    auto annotations = *manifest.annotations;
-    std::cout << "Annotations:" << std::endl;
-    for (auto& annotation : annotations.array) {
-      std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;
-    }
-  }
-  else {
-    std::cout << "No Annotations" << std::endl;
-  }
-  return EXIT_SUCCESS;
+  return Valid();
 }

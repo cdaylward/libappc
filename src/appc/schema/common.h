@@ -239,6 +239,18 @@ struct ArrayType : Type<T> {
 };
 
 
+template<typename T, typename E>
+auto begin(const ArrayType<T, E>& array_type) -> decltype(array_type.array.begin()) {
+  return std::begin(array_type.array);
+}
+
+
+template<typename T, typename E>
+auto end(const ArrayType<T, E>& array_type) -> decltype(array_type.array.end()) {
+  return std::end(array_type.array);
+}
+
+
 template<typename T>
 struct NameValueType : Type<T> {
   const std::string name;

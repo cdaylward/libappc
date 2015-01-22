@@ -4,8 +4,10 @@
 
 #include "appc/schema/common.h"
 
+
 namespace appc {
 namespace schema {
+
 
 struct AcVersion : StringType<AcVersion> {
   explicit AcVersion(const std::string& version)

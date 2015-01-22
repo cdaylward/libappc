@@ -21,9 +21,9 @@ struct AppRef : Type<AppRef> {
   const Option<Annotations> annotations;
 
   explicit AppRef(const ImageID& image_id,
-                  const Option<AppName>& app_name,
-                  const Option<Isolators>& isolators,
-                  const Option<Annotations>& annotations)
+                  const Option<AppName>& app_name = None<AppName>(),
+                  const Option<Isolators>& isolators = None<Isolators>(),
+                  const Option<Annotations>& annotations = None<Annotations>())
   : image_id(image_id),
     app_name(app_name),
     isolators(isolators),
@@ -44,6 +44,21 @@ struct AppRef : Type<AppRef> {
                          *app_name,
                          *isolators,
                          *annotations));
+  }
+
+  static Json to_json(const AppRef& app_ref) {
+    Json json{};
+    json["imageID"] = ImageID::to_json(app_ref.image_id);
+    if (app_ref.app_name) {
+      json["app"] = AppName::to_json(*app_ref.app_name);
+    }
+    if (app_ref.app_name) {
+      json["isolators"] = Isolators::to_json(*app_ref.isolators);
+    }
+    if (app_ref.app_name) {
+      json["annotations"] = Annotations::to_json(*app_ref.annotations);
+    }
+    return json;
   }
 
   Status validate() const {

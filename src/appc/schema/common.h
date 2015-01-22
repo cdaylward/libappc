@@ -65,6 +65,15 @@ Status validate_if_some(const Option<T>& option) {
 
 
 template<typename T>
+Json to_json_if_some(const Option<T>& option) {
+  Json json{};
+  if (option) {
+    json = T::to_json(*option);
+  }
+  return json;
+}
+
+template<typename T>
 struct Type {
   virtual ~Type() = default;
   virtual Status validate() const = 0;
@@ -208,6 +217,14 @@ struct ArrayType : Type<T> {
       array.push_back(*try_e);
     }
     return Result(T{array});
+  }
+
+  static Json to_json(const ArrayType<T, E>& array) {
+    Json json;
+    for (const auto& element : array.array) {
+      json.push_back(E::to_json(element));
+    }
+    return json;
   }
 
   virtual Status validate() const {

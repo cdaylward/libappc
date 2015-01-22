@@ -27,9 +27,9 @@ struct ContainerRuntimeManifest {
                                     const AcKind& ac_kind,
                                     const UUID& uuid,
                                     const AppRefs& app_refs,
-                                    const Option<Volumes>& volumes,
-                                    const Option<Isolators>& isolators,
-                                    const Option<Annotations>& annotations)
+                                    const Option<Volumes>& volumes = None<Volumes>(),
+                                    const Option<Isolators>& isolators = None<Isolators>(),
+                                    const Option<Annotations>& annotations = None<Annotations>())
     : ac_version(ac_version),
       ac_kind(ac_kind),
       uuid(uuid),
@@ -61,6 +61,24 @@ struct ContainerRuntimeManifest {
         *volumes,
         *isolators,
         *annotations));
+  }
+
+  static Json to_json(const ContainerRuntimeManifest& crm) {
+    Json json{};
+    json["acVersion"] = AcVersion::to_json(crm.ac_version);
+    json["acKind"] = AcKind::to_json(crm.ac_kind);
+    json["uuid"] = UUID::to_json(crm.uuid);
+    json["apps"] = AppRefs::to_json(crm.app_refs);
+    if (crm.volumes) {
+      json["volumes"] = Volumes::to_json(*crm.volumes);
+    }
+    if (crm.isolators) {
+      json["isolators"] = Isolators::to_json(*crm.isolators);
+    }
+    if (crm.annotations) {
+      json["annotations"] = Annotations::to_json(*crm.annotations);
+    }
+    return json;
   }
 
   Status validate() const {

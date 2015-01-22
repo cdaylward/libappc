@@ -29,7 +29,7 @@ struct MountPointName : ACName<MountPointName> {
 
 
 struct MountPointNames : ArrayType<MountPointNames, MountPointName> {
-  explicit MountPointNames(const std::vector<MountPointName> array)
+  explicit MountPointNames(const std::vector<MountPointName>& array)
   : ArrayType<MountPointNames, MountPointName>(array) {}
 };
 
@@ -54,8 +54,8 @@ struct Volume : Type<Volume> {
 
   explicit Volume(const VolumeKind& kind,
                   const MountPointNames& fulfills,
-                  const Option<VolumeSource>& source,
-                  const Option<ReadOnly>& read_only)
+                  const Option<VolumeSource>& source = None<VolumeSource>(),
+                  const Option<ReadOnly>& read_only = None<ReadOnly>())
   : kind(kind),
     fulfills(fulfills),
     source(source),
@@ -78,6 +78,19 @@ struct Volume : Type<Volume> {
                          *read_only));
   }
 
+  static Json to_json(const Volume& volume) {
+    Json json{};
+    json["kind"] = VolumeKind::to_json(volume.kind);
+    json["fulfills"] = MountPointNames::to_json(volume.fulfills);
+    if (volume.source) {
+      json["source"] = VolumeSource::to_json(*volume.source);
+    }
+    if (volume.read_only) {
+      json["readOnly"] = ReadOnly::to_json(*volume.read_only);
+    }
+    return json;
+  }
+
   Status validate() const {
     Status host_has_source = [this] {
       if (kind.value == "host" && !source) {
@@ -97,7 +110,7 @@ struct Volume : Type<Volume> {
 
 
 struct Volumes : ArrayType<Volumes, Volume> {
-  explicit Volumes(const std::vector<Volume> array)
+  explicit Volumes(const std::vector<Volume>& array)
   : ArrayType<Volumes, Volume>(array) {}
 };
 

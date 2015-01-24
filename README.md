@@ -2,7 +2,12 @@
 
 ## Overview
 
-A C++ library for doing things with [App Containers](https://github.com/appc/spec). The goal of the libary is to be a flexible toolkit: manifest parsing and creation, pluggable discovery, image creation / extraction / caching, thin-provisioned file systems, etc...not a particular [ACE](https://github.com/appc/spec/blob/master/SPEC.md#app-container-executor) implementation. In other words, the goal is that you can use it to make one. Some or all pieces may be used, just use the headers you require.
+A C++ library for working with [App Containers](https://github.com/appc/spec). The goal of the
+libary is to be a flexible toolkit: manifest parsing and creation, pluggable discovery, image
+creation / extraction / caching, thin-provisioned file systems, etc...not a particular
+[ACE](https://github.com/appc/spec/blob/master/SPEC.md#app-container-executor) implementation. In
+other words, the goal is that you can use it to make one. Some or all pieces may be used, just use
+the headers you require.
 
 ## Getting Started
 
@@ -28,7 +33,8 @@ Build the examples:
 
 ## Examples
 
-Example code is located in src/examples. Run `build.sh` and the examples will be built in bin/examples, e.g.
+Example code is located in src/examples. Run `build.sh` and the examples will be built in
+bin/examples, e.g.
 
 ```
 $ ./build.sh
@@ -54,7 +60,8 @@ Invalid Manifest: "imageID must be <hash name>-<hex representation> format"
 
 ## Status
 
-Early, early (like really early) development. Most pieces are incomplete and require tests, build scripts need work, use of syntax likely inconsistent, etc.
+Early, early (like really early) development. Most pieces are incomplete and require tests, build
+scripts need work, use of syntax likely inconsistent, etc.
 
 ## Contributing
 

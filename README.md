@@ -15,21 +15,15 @@ Requires functional std::regex (If using gcc, >= 4.9)
 
 Bootstrap it (download and build dependencies):
 
-```
-./bootstrap.sh
-```
+`./bootstrap.sh`
 
 Run the tests:
 
-```
-./test.sh
-```
+`./test.sh`
 
 Build the examples:
 
-```
-./build.sh
-```
+`./build.sh`
 
 ## Examples
 

@@ -1,3 +1,20 @@
+// Copyright 2015 Charles D. Aylward
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// A (possibly updated) copy of of this software is available at
+// https://github.com/cdaylward/libappc
+
 #pragma once
 
 #include "appc/schema/ac_kind.h"
@@ -54,13 +71,13 @@ struct ContainerRuntimeManifest {
     }
 
     return Result(ContainerRuntimeManifest(
-        *ac_version,
-        *ac_kind,
-        *uuid,
-        *app_refs,
-        *volumes,
-        *isolators,
-        *annotations));
+        from_result(ac_version),
+        from_result(ac_kind),
+        from_result(uuid),
+        from_result(app_refs),
+        from_result(volumes),
+        from_result(isolators),
+        from_result(annotations)));
   }
 
   static Json to_json(const ContainerRuntimeManifest& crm) {
@@ -70,13 +87,13 @@ struct ContainerRuntimeManifest {
     json["uuid"] = UUID::to_json(crm.uuid);
     json["apps"] = AppRefs::to_json(crm.app_refs);
     if (crm.volumes) {
-      json["volumes"] = Volumes::to_json(*crm.volumes);
+      json["volumes"] = Volumes::to_json(from_some(crm.volumes));
     }
     if (crm.isolators) {
-      json["isolators"] = Isolators::to_json(*crm.isolators);
+      json["isolators"] = Isolators::to_json(from_some(crm.isolators));
     }
     if (crm.annotations) {
-      json["annotations"] = Annotations::to_json(*crm.annotations);
+      json["annotations"] = Annotations::to_json(from_some(crm.annotations));
     }
     return json;
   }

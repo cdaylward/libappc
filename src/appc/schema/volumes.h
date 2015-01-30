@@ -1,3 +1,20 @@
+// Copyright 2015 Charles D. Aylward
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// A (possibly updated) copy of of this software is available at
+// https://github.com/cdaylward/libappc
+
 #pragma once
 
 #include "appc/schema/common.h"
@@ -72,10 +89,10 @@ struct Volume : Type<Volume> {
       return collect_failure_reasons<Volume>(kind, fulfills, read_only, source);
     }
 
-    return Result(Volume(*kind,
-                         *fulfills,
-                         *source,
-                         *read_only));
+    return Result(Volume(from_result(kind),
+                         from_result(fulfills),
+                         from_result(source),
+                         from_result(read_only)));
   }
 
   static Json to_json(const Volume& volume) {
@@ -83,10 +100,10 @@ struct Volume : Type<Volume> {
     json["kind"] = VolumeKind::to_json(volume.kind);
     json["fulfills"] = MountPointNames::to_json(volume.fulfills);
     if (volume.source) {
-      json["source"] = VolumeSource::to_json(*volume.source);
+      json["source"] = VolumeSource::to_json(from_some(volume.source));
     }
     if (volume.read_only) {
-      json["readOnly"] = ReadOnly::to_json(*volume.read_only);
+      json["readOnly"] = ReadOnly::to_json(from_some(volume.read_only));
     }
     return json;
   }

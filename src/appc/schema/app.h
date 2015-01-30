@@ -1,5 +1,21 @@
-#pragma once
+// Copyright 2015 Charles D. Aylward
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// A (possibly updated) copy of of this software is available at
+// https://github.com/cdaylward/libappc
 
+#pragma once
 
 #include "appc/schema/common.h"
 #include "appc/schema/event_handlers.h"
@@ -11,7 +27,6 @@
 #include "appc/schema/ports.h"
 #include "appc/schema/try_json.h"
 #include "appc/schema/user.h"
-
 #include "appc/util/try.h"
 #include "appc/util/try_option.h"
 
@@ -68,14 +83,14 @@ struct App : Type<App> {
                                           mount_points, ports, isolators);
     }
 
-    return Result(App(*exec,
-                      *user,
-                      *group,
-                      *event_handlers,
-                      *working_directory,
-                      *mount_points,
-                      *ports,
-                      *isolators));
+    return Result(App(from_result(exec),
+                      from_result(user),
+                      from_result(group),
+                      from_result(event_handlers),
+                      from_result(working_directory),
+                      from_result(mount_points),
+                      from_result(ports),
+                      from_result(isolators)));
   }
 
   Status validate() const {

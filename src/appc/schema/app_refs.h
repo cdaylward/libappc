@@ -1,11 +1,27 @@
+// Copyright 2015 Charles D. Aylward
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// A (possibly updated) copy of of this software is available at
+// https://github.com/cdaylward/libappc
+
 #pragma once
 
 #include "appc/schema/annotations.h"
-#include "appc/schema/image_id.h"
 #include "appc/schema/app_name.h"
+#include "appc/schema/image_id.h"
 #include "appc/schema/isolators.h"
 #include "appc/schema/try_json.h"
-
 #include "appc/util/try_option.h"
 
 
@@ -40,23 +56,23 @@ struct AppRef : Type<AppRef> {
       return collect_failure_reasons<AppRef>(image_id, app_name, isolators, annotations);
     }
 
-    return Result(AppRef(*image_id,
-                         *app_name,
-                         *isolators,
-                         *annotations));
+    return Result(AppRef(from_result(image_id),
+                         from_result(app_name),
+                         from_result(isolators),
+                         from_result(annotations)));
   }
 
   static Json to_json(const AppRef& app_ref) {
     Json json{};
     json["imageID"] = ImageID::to_json(app_ref.image_id);
     if (app_ref.app_name) {
-      json["app"] = AppName::to_json(*app_ref.app_name);
+      json["app"] = AppName::to_json(from_some(app_ref.app_name));
     }
     if (app_ref.app_name) {
-      json["isolators"] = Isolators::to_json(*app_ref.isolators);
+      json["isolators"] = Isolators::to_json(from_some(app_ref.isolators));
     }
     if (app_ref.app_name) {
-      json["annotations"] = Annotations::to_json(*app_ref.annotations);
+      json["annotations"] = Annotations::to_json(from_some(app_ref.annotations));
     }
     return json;
   }

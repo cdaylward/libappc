@@ -47,11 +47,11 @@ int main(int args, char** argv) {
   Status valid = [&kind, &json]() {
     if (kind == "ContainerRuntimeManifest") {
       auto manifest_try = ContainerRuntimeManifest::from_json(json);
-      return manifest_try ? dump_CRM(*manifest_try) : Invalid(manifest_try.failure_reason());
+      return manifest_try ? dump_CRM(from_result(manifest_try)) : Invalid(manifest_try.failure_reason());
     }
     else if (kind == "ImageManifest") {
       auto manifest_try = ImageManifest::from_json(json);
-      return manifest_try ? dump_IM(*manifest_try) : Invalid(manifest_try.failure_reason());
+      return manifest_try ? dump_IM(from_result(manifest_try)) : Invalid(manifest_try.failure_reason());
     }
     return Invalid("Unknown manifest kind: " + kind);
   }();
@@ -81,21 +81,21 @@ static Status dump_CRM(const ContainerRuntimeManifest& container)
     }
     std::cout << "      Isolators:" << std::endl;
     if (app.isolators) {
-      auto& isolators = *app.isolators;
+      auto& isolators = from_some(app.isolators);
       for (auto& isolator : isolators) {
         std::cout << "        " << isolator.name << " -> " << isolator.value << std::endl;
       }
     }
     std::cout << "      Annotations:" << std::endl;
     if (app.annotations) {
-      auto& annotations = *app.annotations;
+      auto& annotations = from_some(app.annotations);
       for (auto& annotation : annotations) {
         std::cout << "        " << annotation.name << " -> " << annotation.value << std::endl;
       }
     }
   }
   if (container.volumes) {
-    auto volumes = *container.volumes;
+    auto volumes = from_some(container.volumes);
     std::cout << "Volumes:" << std::endl;
     for (auto& volume : volumes) {
       std::cout << "  Kind: " << volume.kind.value << std::endl;
@@ -109,7 +109,7 @@ static Status dump_CRM(const ContainerRuntimeManifest& container)
     std::cout << "No Volumes" << std::endl;
   }
   if (container.isolators) {
-    auto isolators = *container.isolators;
+    auto isolators = from_some(container.isolators);
     std::cout << "Isolators:" << std::endl;
     for (auto& isolator : isolators) {
       std::cout << "  " << isolator.name << " -> " << isolator.value << std::endl;
@@ -119,7 +119,7 @@ static Status dump_CRM(const ContainerRuntimeManifest& container)
     std::cout << "No Isolators" << std::endl;
   }
   if (container.annotations) {
-    auto annotations = *container.annotations;
+    auto annotations = from_some(container.annotations);
     std::cout << "Annotations:" << std::endl;
     for (auto& annotation : annotations) {
       std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;
@@ -142,14 +142,14 @@ static Status dump_IM(const ImageManifest& image)
   std::cout << "Version: " << image.ac_version.value << std::endl;
   std::cout << "Name: " << image.name.value << std::endl;
   if (image.labels) {
-    auto labels = *image.labels;
+    auto labels = from_some(image.labels);
     std::cout << "Labels:" << std::endl;
     for (auto& label : labels) {
       std::cout << "  " << label.name << " -> " << label.value << std::endl;
     }
   }
   if (image.app) {
-    auto app = *image.app;
+    auto app = from_some(image.app);
     std::cout << "App:" << std::endl;
     std::cout << "  Exec:" << std::endl;
     for (auto& arg : app.exec) {
@@ -158,7 +158,7 @@ static Status dump_IM(const ImageManifest& image)
     std::cout << "  User: " << app.user.value << std::endl;
     std::cout << "  Group: " << app.group.value << std::endl;
     if (app.event_handlers) {
-      auto event_handlers = *app.event_handlers;
+      auto event_handlers = from_some(app.event_handlers);
       std::cout << "  Event Handlers:" << std::endl;
       for (auto& handler : event_handlers) {
         std::cout << "    " << handler.name.value << std::endl;
@@ -168,7 +168,7 @@ static Status dump_IM(const ImageManifest& image)
       }
     }
     if (app.ports) {
-      auto ports = *app.ports;
+      auto ports = from_some(app.ports);
       std::cout << "  Ports:" << std::endl;
       for (auto& port : ports) {
         std::cout << "    Name: " << port.name.value << std::endl;
@@ -177,14 +177,14 @@ static Status dump_IM(const ImageManifest& image)
       }
     }
     if (app.isolators) {
-      auto isolators = *app.isolators;
+      auto isolators = from_some(app.isolators);
       std::cout << "  Isolators:" << std::endl;
       for (auto& isolator : isolators) {
         std::cout << "    " << isolator.name << " -> " << isolator.value << std::endl;
       }
     }
     if (app.mount_points) {
-      auto mount_points = *app.mount_points;
+      auto mount_points = from_some(app.mount_points);
       std::cout << "  Mount Points:" << std::endl;
       for (auto& mount : mount_points) {
         std::cout << "    " << mount.name.value << std::endl;
@@ -194,16 +194,16 @@ static Status dump_IM(const ImageManifest& image)
     }
   }
   if (image.dependencies) {
-    auto dependencies = *image.dependencies;
+    auto dependencies = from_some(image.dependencies);
     std::cout << "Dependencies:" << std::endl;
     for (auto& dep : dependencies) {
       std::cout << "  " << dep.app_name.value << std::endl;
       if (dep.image_id) {
-        auto image_id = *dep.image_id;
+        auto image_id = from_some(dep.image_id);
         std::cout << "    Image ID: " << image_id.value << std::endl;
       }
       if (dep.labels) {
-        auto labels = *dep.labels;
+        auto labels = from_some(dep.labels);
         std::cout << "    Labels:" << std::endl;
         for (auto& label : labels) {
           std::cout << "      " << label.name << " -> " << label.value << std::endl;
@@ -212,14 +212,14 @@ static Status dump_IM(const ImageManifest& image)
     }
   }
   if (image.path_whitelist) {
-    auto path_whitelist = *image.path_whitelist;
+    auto path_whitelist = from_some(image.path_whitelist);
     std::cout << "Path Whitelist:" << std::endl;
     for (auto& path : path_whitelist) {
       std::cout << "  " << path.value << std::endl;
     }
   }
   if (image.annotations) {
-    auto annotations = *image.annotations;
+    auto annotations = from_some(image.annotations);
     std::cout << "Annotations:" << std::endl;
     for (auto& annotation : annotations) {
       std::cout << "  " << annotation.name << " -> " << annotation.value << std::endl;

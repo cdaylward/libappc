@@ -13,17 +13,9 @@ the headers you require.
 
 Requires functional std::regex (If using gcc, >= 4.9)
 
-Bootstrap it (download and build dependencies):
-
-`./bootstrap.sh`
-
-Run the tests:
-
-`./test.sh`
-
-Build the examples:
-
-`./build.sh`
+1. Bootstrap it (download and build dependencies): `./bootstrap.sh`
+2. Run the tests: `./test.sh`
+3. Build the examples: `./build.sh`
 
 ## Examples
 
@@ -32,30 +24,46 @@ bin/examples, e.g.
 
 ```
 $ ./build.sh
-[ 36%] Built target _get_gtest
-[ 72%] Built target _get_libarchive
-[ 77%] Built target gtest
-[ 81%] Built target gtest_main
+[ 34%] Built target _get_gtest
+[ 69%] Built target _get_libarchive
+[ 73%] Built target gtest
+[ 78%] Built target gtest_main
+[ 82%] Built target discover_image
 [ 86%] Built target generate_complete_crm
-[ 90%] Built target generate_minimal_crm
+[ 91%] Built target generate_minimal_crm
 [ 95%] Built target parse
 [100%] Built target validate
+
 $ ./bin/examples/schema/generate_complete_crm > /tmp/container.json
+
 $ ./bin/examples/schema/validate /tmp/container.json || echo invalid
+
 $ ./bin/examples/schema/parse /tmp/container.json
 Kind: ContainerRuntimeManifest
 Version: 0.2.0
 UUID: 0F426158-97EE-49F8-B4A3-792ECDA926FB
 --- 8< ---
+
 $ ./bin/examples/schema/validate image_bad.json
 Invalid Manifest: "imageID must be <hash name>-<hex representation> format"
-```
 
+$ ./bin/examples/discovery/discover_image
+Resolved: example.com/worker -> file:///tmp/images/example.com/worker-0.0.1-linux-x86_64.aci
+Fetch failed: file:///tmp/images/example.com/worker-0.0.1-linux-x86_64.aci No such file or directory
+Resolved: example.com/worker -> https://example.com/worker-0.0.1-linux-x86_64.aci
+The requested URL returned error: 404 Not Found
+Fetch failed: Failed to fetch https://example.com/worker-0.0.1-linux-x86_64.aci
+Failed to retrieve image for example.com/worker
+```
 
 ## Status
 
 Early, early (like really early) development. Most pieces are incomplete and require tests, build
 scripts need work, use of syntax likely inconsistent, etc.
+
+Exists in some form:
+- Schema parsing and validation
+- Discovery (Simple, Local, no Meta)
 
 ## Contributing
 

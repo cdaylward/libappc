@@ -20,7 +20,7 @@
 #include <vector>
 #include <map>
 
-#include "appc/discovery/discovery.h"
+#include "appc/discovery/types.h"
 #include "appc/util/namespace.h"
 #include "appc/util/try.h"
 

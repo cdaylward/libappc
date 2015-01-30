@@ -4,5 +4,6 @@ include_directories(.)
 
 ######
 
+add_subdirectory(examples/discovery)
 add_subdirectory(examples/schema)
 

@@ -88,8 +88,8 @@ public:
     // TODO restrict this to ACI spec
     archive_read_support_filter_all(archive.get());
     archive_read_support_format_all(archive.get());
-    int ret_val = archive_read_open_filename(archive.get(), filename.c_str(), 10240);
-    if (ret_val != ARCHIVE_OK) {
+
+    if (archive_read_open_filename(archive.get(), filename.c_str(), 10240) != ARCHIVE_OK) {
       return Failure<FileList>(archive_error_string(archive.get()));
     }
 
@@ -108,15 +108,16 @@ public:
   Status validate_structure() {
     std::unique_ptr<struct archive, decltype(&archive_read_free)> archive{
         archive_read_new(), archive_read_free};
+    // TODO restrict
     archive_read_support_filter_all(archive.get());
     archive_read_support_format_all(archive.get());
-    int ret_val = archive_read_open_filename(archive.get(), filename.c_str(), 10240);
-    if (ret_val != ARCHIVE_OK) {
+
+    if (archive_read_open_filename(archive.get(), filename.c_str(), 10240) != ARCHIVE_OK) {
       return Invalid(archive_error_string(archive.get()));
     }
 
-    unsigned int manifest_count = 0;
     {
+      unsigned int manifest_count = 0;
       struct archive_entry* entry;
       while (archive_read_next_header(archive.get(), &entry) == ARCHIVE_OK) {
         const std::string raw_path{ archive_entry_pathname(entry) };
@@ -152,10 +153,11 @@ public:
   Try<std::string> manifest() {
     std::unique_ptr<struct archive, decltype(&archive_read_free)> archive{
         archive_read_new(), archive_read_free};
+    // TODO restrict
     archive_read_support_filter_all(archive.get());
     archive_read_support_format_all(archive.get());
-    int ret_val = archive_read_open_filename(archive.get(), filename.c_str(), 10240);
-    if (ret_val != ARCHIVE_OK) {
+
+    if (archive_read_open_filename(archive.get(), filename.c_str(), 10240) != ARCHIVE_OK) {
       return Failure<std::string>(archive_error_string(archive.get()));
     }
 

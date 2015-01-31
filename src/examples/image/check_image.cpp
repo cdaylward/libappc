@@ -16,24 +16,30 @@ int main(int args, char** argv) {
 
   const std::string filename{argv[1]};
 
-  Image tarball(filename);
+  Image image{filename};
 
-  auto valid_structure = tarball.validate_structure();
+  auto valid_structure = image.validate_structure();
   if (!valid_structure) {
     std::cerr << filename << " not a valid ACI: " << valid_structure.message << std::endl;
     return EXIT_FAILURE;
   }
 
-  auto file_list_try = tarball.file_list();
+  std::cerr << "ACI is valid." << std::endl;
+
+  auto file_list_try = image.file_list();
 
   if (!file_list_try) {
     std::cerr << file_list_try.failure_reason() << std::endl;
     return EXIT_FAILURE;
   }
 
+  std::cerr << "File list:" << std::endl;
   for (const auto& filename : *file_list_try) {
     std::cout << filename << std::endl;
   }
+
+  std::cerr << "Manifest:" << std::endl;
+  std::cerr << from_result(image.manifest()) << std::endl;
 
   return EXIT_SUCCESS;
 }

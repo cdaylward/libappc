@@ -82,6 +82,8 @@ public:
   explicit Image(const std::string& filename)
   : filename(filename) {}
 
+
+  // List files in the rootfs
   Try<FileList> file_list() {
     std::unique_ptr<struct archive, decltype(&archive_read_free)> archive{
         archive_read_new(), archive_read_free};
@@ -97,7 +99,11 @@ public:
     {
       struct archive_entry* entry;
       while (archive_read_next_header(archive.get(), &entry) == ARCHIVE_OK) {
-        file_list.emplace_back(archive_entry_pathname(entry));
+        std::string path{archive_entry_pathname(entry)};
+        if (path.length() > rootfs_filename.length() &&
+            path.compare(0, rootfs_filename.length(), rootfs_filename) == 0) {
+          file_list.push_back(path.substr(rootfs_filename.length()));
+        }
         archive_read_data_skip(archive.get());
       }
     }
@@ -105,6 +111,7 @@ public:
     return Result(file_list);
   }
 
+  // Check for valid ACI structure
   Status validate_structure() {
     std::unique_ptr<struct archive, decltype(&archive_read_free)> archive{
         archive_read_new(), archive_read_free};
@@ -126,17 +133,11 @@ public:
         // TODO fixup
         if (path == manifest_filename) {
           manifest_count++;
-          if (manifest_count > 1) {
-            return Invalid("Multiple manifest dentries present.");
-          }
-          if (!(entry_mode & AE_IFREG)) {
-            return Invalid("manifest is not a regular file");
-          }
+          if (manifest_count > 1) return Invalid("Multiple manifest dentries present.");
+          if (!(entry_mode & AE_IFREG)) return Invalid("manifest is not a regular file");
         }
         else if (path == rootfs_filename) {
-          if (!(entry_mode & AE_IFDIR)) {
-            return Invalid("rootfs is not a directory");
-          }
+          if (!(entry_mode & AE_IFDIR)) return Invalid("rootfs is not a directory");
         }
         else if (path.length() <= rootfs_filename.length() ||
                  path.compare(0, rootfs_filename.length(), rootfs_filename) != 0) {
@@ -150,6 +151,7 @@ public:
     return Valid();
   }
 
+  // Return the manifest as a string
   Try<std::string> manifest() {
     std::unique_ptr<struct archive, decltype(&archive_read_free)> archive{
         archive_read_new(), archive_read_free};

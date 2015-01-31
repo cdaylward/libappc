@@ -20,7 +20,8 @@
 #include <map>
 #include <cstdlib>
 
-#include "appc/discovery/discovery.h"
+#include "appc/discovery/aci_name.h"
+#include "appc/discovery/strategy.h"
 #include "appc/util/namespace.h"
 #include "appc/util/status.h"
 #include "appc/util/try.h"

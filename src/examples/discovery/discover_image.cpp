@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "appc/discovery/provider.h"
 #include "appc/discovery/strategy/local.h"
 #include "appc/discovery/strategy/meta.h"
 #include "appc/discovery/strategy/simple.h"

@@ -24,7 +24,8 @@
 
 #include "3rdparty/cdaylward/pathname.h"
 
-#include "appc/discovery/discovery.h"
+#include "appc/discovery/aci_name.h"
+#include "appc/discovery/strategy.h"
 #include "appc/util/namespace.h"
 #include "appc/util/option.h"
 #include "appc/util/status.h"

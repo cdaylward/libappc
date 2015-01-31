@@ -30,14 +30,14 @@ const char separator{'/'};
 
 inline std::string trim_leading_slash(const std::string& path) {
   std::size_t pos;
-  for (pos = 0; pos != std::string::npos && path[pos] == separator; pos++);
+  for (pos = 0; path[pos] == separator; pos++);
   return path.substr(pos);
 }
 
 
 inline std::string trim_trailing_slash(const std::string& path) {
   std::size_t pos;
-  for (pos = path.length() - 1; pos != std::string::npos && path[pos] == separator; pos--);
+  for (pos = path.length() - 1; path[pos] == separator; pos--);
   return path.substr(0, pos + 1);
 }
 

@@ -28,14 +28,14 @@ int main(int args, char** argv) {
   }
 
   std::cout << from_result(manifest) << std::endl;
-  // Json json;
-  // try {
-  //   json = Json::parse(from_result(manifest));
-  // } catch (const std::invalid_argument& err) {
-  //   std::cerr << err.what() << std::endl;
-  //   return EXIT_FAILURE;
-  // }
-  // std::cout << json.dump(4) << std::endl;
+  Json json;
+  try {
+    json = Json::parse(from_result(manifest));
+  } catch (const std::invalid_argument& err) {
+    std::cerr << err.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout << json.dump(4) << std::endl;
 
   return EXIT_SUCCESS;
 }

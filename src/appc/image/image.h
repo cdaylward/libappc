@@ -99,7 +99,7 @@ public:
     {
       struct archive_entry* entry;
       while (archive_read_next_header(archive.get(), &entry) == ARCHIVE_OK) {
-        std::string path{archive_entry_pathname(entry)};
+        const std::string path = trim_dot_slash(archive_entry_pathname(entry));
         if (path.length() > rootfs_filename.length() &&
             path.compare(0, rootfs_filename.length(), rootfs_filename) == 0) {
           file_list.push_back(path.substr(rootfs_filename.length()));
@@ -127,8 +127,7 @@ public:
       unsigned int manifest_count = 0;
       struct archive_entry* entry;
       while (archive_read_next_header(archive.get(), &entry) == ARCHIVE_OK) {
-        const std::string raw_path{ archive_entry_pathname(entry) };
-        const std::string path = trim_dot_slash(raw_path);
+        const std::string path = trim_dot_slash(archive_entry_pathname(entry));
         const mode_t entry_mode = archive_entry_filetype(entry);
         // TODO fixup
         if (path == manifest_filename) {
@@ -166,10 +165,8 @@ public:
     {
       struct archive_entry* entry;
       while (archive_read_next_header(archive.get(), &entry) == ARCHIVE_OK) {
-        const std::string raw_path{ archive_entry_pathname(entry) };
+        const std::string path = trim_dot_slash(archive_entry_pathname(entry));
         const mode_t entry_mode = archive_entry_filetype(entry);
-        std::string path = raw_path.length() > 2 && raw_path.compare(0, 2, "./") == 0 ?
-                             raw_path.substr(2) : raw_path;
         if (path == manifest_filename) {
           if (!(entry_mode & AE_IFREG)) {
             return Failure<std::string>("manifest is not a regular file");

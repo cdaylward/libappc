@@ -27,7 +27,6 @@ int main(int args, char** argv) {
     return EXIT_FAILURE;
   }
 
-  std::cout << from_result(manifest) << std::endl;
   Json json;
   try {
     json = Json::parse(from_result(manifest));

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 include(ExternalProject)
 
 set(3RDPARTY_USR ${CMAKE_CURRENT_LIST_DIR}/usr)
-#set(3RDPARTY_USR ${CMAKE_CURRENT_LIST_DIR}/usr PARENT_SCOPE)
+set(3RDPARTY_USR ${CMAKE_CURRENT_LIST_DIR}/usr PARENT_SCOPE)
 
 set(GTEST_DL_DIR gtest-1.7.0)
 ExternalProject_add(_get_gtest

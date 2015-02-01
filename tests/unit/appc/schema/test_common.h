@@ -62,7 +62,7 @@ TEST(StringType, not_from_other_json) {
 TEST(StringType, to_json) {
   const Json expected_json = "A String";
   const Json json = SomeStringType::to_json(SomeStringType("A String"));
-  ASSERT_EQ(Json::value_type::string, json.type());
+  ASSERT_EQ(Json::value_t::string, json.type());
   ASSERT_EQ(expected_json, json);
 }
 
@@ -71,7 +71,7 @@ TEST(StringType, marshal_to_unmarshal) {
   const Try<SomeStringType> a_try = SomeStringType::from_json(expected_json);
   ASSERT_TRUE(a_try);
   const Json json = SomeStringType::to_json(*a_try);
-  ASSERT_EQ(Json::value_type::string, json.type());
+  ASSERT_EQ(Json::value_t::string, json.type());
   ASSERT_EQ(expected_json, json);
 }
 

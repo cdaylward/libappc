@@ -78,7 +78,7 @@ struct StringType : Type<T> {
   }
 
   static Try<T> from_json(const Json& json) {
-    if (json.type() != Json::value_type::string) {
+    if (json.type() != Json::value_t::string) {
       return Failure<T>("StringType must be intialized from JSON string type.");
     }
     return Result(T(json.get<std::string>()));
@@ -111,7 +111,7 @@ struct IntegerType : Type<T> {
   }
 
   static Try<T> from_json(const Json& json) {
-    if (json.type() != Json::value_type::number) {
+    if (json.type() != Json::value_t::number) {
       return Failure<T>("IntegerType must be intialized from JSON number type.");
     }
     return Result(T(json.get<int>()));
@@ -143,7 +143,7 @@ struct BooleanType : Type<T> {
   }
 
   static Try<T> from_json(const Json& json) {
-    if (json.type() != Json::value_type::boolean) {
+    if (json.type() != Json::value_t::boolean) {
       return Failure<T>("BooleanType must be intialized from JSON boolean type.");
     }
     return Result(T(json.get<bool>()));
@@ -182,7 +182,7 @@ struct ArrayType : Type<T> {
   static Try<T> from_json(const Json& json) {
     static_assert(std::is_base_of<Type<E>, E>::value, "E not of Type<E> in ArrayType");
 
-    if (json.type() != Json::value_type::array) {
+    if (json.type() != Json::value_t::array) {
       return Failure<T>("ArrayType must be initialized from JSON array.");
     }
 
@@ -248,7 +248,7 @@ struct NameValueType : Type<T> {
       value(std::move(other.value)) {}
 
   static Try<T> from_json(const Json& json) {
-    if (json.type() != Json::value_type::object) {
+    if (json.type() != Json::value_t::object) {
       return Failure<T>("NameValue types must be initialized from JSON objects");
     }
     try {

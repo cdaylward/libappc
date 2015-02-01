@@ -21,13 +21,15 @@ int main(int args, char** argv) {
 
   Image image{filename};
 
-  auto valid_structure = image.validate_structure();
-  if (!valid_structure) {
-    std::cerr << filename << " not a valid ACI: " << valid_structure.message << std::endl;
+  const auto file_list = image.file_list();
+  if (!file_list) {
+    std::cerr << file_list.failure_reason() << std::endl;
     return EXIT_FAILURE;
   }
 
-  std::cerr << "ACI is valid." << std::endl;
+  for (const auto& filename : *file_list) {
+    std::cout << filename << std::endl;
+  }
 
   return EXIT_SUCCESS;
 }

@@ -22,6 +22,7 @@
 #include <archive.h>
 #include <archive_entry.h>
 
+#include "3rdparty/cdaylward/pathname.h"
 #include "appc/util/status.h"
 #include "appc/util/try.h"
 
@@ -82,7 +83,6 @@ public:
   explicit Image(const std::string& filename)
   : filename(filename) {}
 
-
   // List files in the rootfs
   Try<FileList> file_list() {
     std::unique_ptr<struct archive, decltype(&archive_read_free)> archive{
@@ -122,7 +122,7 @@ public:
     if (archive_read_open_filename(archive.get(), filename.c_str(), 10240) != ARCHIVE_OK) {
       return Invalid(archive_error_string(archive.get()));
     }
-
+    // TODO requires at least one rootfs entry?
     {
       unsigned int manifest_count = 0;
       struct archive_entry* entry;
@@ -178,6 +178,68 @@ public:
     }
 
     return Failure<std::string>("Archive did not contain a manifest");
+  }
+
+  // Extract contents of rootfs to base_path (removes rootfs/ base)
+  Status extract_rootfs_to(const std::string& base_path) {
+    std::unique_ptr<struct archive, decltype(&archive_read_free)> archive{
+        archive_read_new(), archive_read_free};
+    archive_read_support_filter_all(archive.get());
+    archive_read_support_format_all(archive.get());
+
+    std::unique_ptr<struct archive, decltype(&archive_write_free)> writer{
+        archive_write_disk_new(), archive_write_free};
+    const int flags = ARCHIVE_EXTRACT_TIME
+                        | ARCHIVE_EXTRACT_PERM
+                        | ARCHIVE_EXTRACT_ACL
+                        | ARCHIVE_EXTRACT_FFLAGS;
+    archive_write_disk_set_options(writer.get(), flags);
+    archive_write_disk_set_standard_lookup(writer.get());
+
+    if (archive_read_open_filename(archive.get(), filename.c_str(), 10240) != ARCHIVE_OK) {
+      return Error(archive_error_string(archive.get()));
+    }
+
+    struct archive_entry* entry;
+    for (int r = archive_read_next_header(archive.get(), &entry);
+         r == ARCHIVE_OK;
+         r = archive_read_next_header(archive.get(), &entry)) {
+      if (r == ARCHIVE_EOF) break;
+      if (r < ARCHIVE_OK) return Error(archive_error_string(archive.get()));
+
+      const std::string entry_path { archive_entry_pathname(entry) };
+
+      if (entry_path == "manifest") {
+        archive_read_data_skip(archive.get());
+        continue;
+      }
+
+      std::string write_path { pathname::join(base_path,
+                                              entry_path.substr(rootfs_filename.length())) };
+      archive_entry_set_pathname(entry, write_path.c_str());
+
+      if (archive_write_header(writer.get(), entry) != ARCHIVE_OK) {
+        return Error(archive_error_string(writer.get()));
+      }
+
+      if (archive_entry_size(entry) > 0) {
+        if (copy_data(archive.get(), writer.get())) {
+          return Error(archive_error_string(writer.get()));
+        }
+      }
+
+      if (archive_write_finish_entry(writer.get()) != ARCHIVE_OK) {
+        return Error(archive_error_string(writer.get()));
+      }
+    }
+
+    // Free will call close so this is not necessary above but used here to
+    // report errors when closing.
+    if (archive_write_close(writer.get()) != ARCHIVE_OK) {
+      return Error(archive_error_string(writer.get()));
+    }
+
+    return Success();
   }
 };
 

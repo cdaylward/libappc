@@ -21,13 +21,14 @@ int main(int args, char** argv) {
 
   Image image{filename};
 
-  auto valid_structure = image.validate_structure();
-  if (!valid_structure) {
-    std::cerr << filename << " not a valid ACI: " << valid_structure.message << std::endl;
-    return EXIT_FAILURE;
+  const std::string base_path{"/tmp/containers/2A2D327D-D3D1-417B-9E3A-177378CF1315"};
+
+  const auto extracted = image.extract_rootfs_to(base_path);
+  if (!extracted) {
+    std::cerr << "Failed to write rootfs: " << extracted.message << std::endl;
   }
 
-  std::cerr << "ACI is valid." << std::endl;
+  std::cerr << "Extracted rootfs to: " << base_path << std::endl;
 
   return EXIT_SUCCESS;
 }

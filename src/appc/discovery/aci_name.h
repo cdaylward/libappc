@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <vector>
-#include <map>
-
 #include "appc/util/namespace.h"
 #include "appc/util/try.h"
 

@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <vector>
-#include <map>
-
 #include "appc/discovery/fetcher.h"
 #include "appc/discovery/resolver.h"
 #include "appc/util/namespace.h"

@@ -18,7 +18,6 @@
 #pragma once
 
 #include <vector>
-#include <map>
 
 #include "appc/discovery/strategy.h"
 #include "appc/util/namespace.h"

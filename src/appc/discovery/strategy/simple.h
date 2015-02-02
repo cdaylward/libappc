@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include <map>
-#include <cstdlib>
+#include <cstdlib> // REM remove when system() hack is removed.
 
 #include "appc/discovery/aci_name.h"
 #include "appc/discovery/strategy.h"

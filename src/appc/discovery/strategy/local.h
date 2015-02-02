@@ -17,10 +17,9 @@
 
 #pragma once
 
-#include <map>
-#include <sys/stat.h>
 #include <cerrno>
 #include <cstring>
+#include <sys/stat.h>
 
 #include "3rdparty/cdaylward/pathname.h"
 

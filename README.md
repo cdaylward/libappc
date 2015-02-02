@@ -17,6 +17,16 @@ Requires functional std::regex (If using gcc, >= 4.9)
 2. Run the tests: `./test.sh`
 3. Build the examples: `./build.sh`
 
+## Status
+
+Early, early (like really early) development. Most pieces are incomplete and require tests, build
+scripts need work, use of syntax likely inconsistent, etc.
+
+Components that exist in some form:
+- Schema parsing and validation
+- Discovery (Simple, Local, no Meta)
+- ACI inspection and extraction
+
 ## Examples
 
 Example code is located in src/examples. Run `build.sh` and the examples will be built in
@@ -55,15 +65,6 @@ The requested URL returned error: 404 Not Found
 Fetch failed: Failed to fetch https://example.com/worker-0.0.1-linux-x86_64.aci
 Failed to retrieve image for example.com/worker
 ```
-
-## Status
-
-Early, early (like really early) development. Most pieces are incomplete and require tests, build
-scripts need work, use of syntax likely inconsistent, etc.
-
-Exists in some form:
-- Schema parsing and validation
-- Discovery (Simple, Local, no Meta)
 
 ## Contributing
 

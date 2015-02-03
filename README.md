@@ -77,4 +77,5 @@ libappc is licensed under the Apache License, Version 2.0.
 Included 3rd party libraries/headers (subject to change):
 
 * JSON parsing is performed by Niels Lohmann's library which is licensed under the MIT license.
+* Image retrieval is performed by libcurl which is licensed under the MIT license.
 * Image extraction is performed by libarchive which is licensed under the BSD 2-Clause license.

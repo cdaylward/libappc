@@ -10,12 +10,17 @@ using namespace appc::discovery;
 
 
 int main(int args, char** argv) {
+  if (args < 2) {
+    std::cerr << "Usage: " << argv[0] << " <app name>" << std::endl;
+    std::cerr << "  e.g. " << argv[0] << " nosecone.net/example" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   // Change these to something that exists.
 
-  Name name{"example.com/worker"};
+  const Name name{argv[1]};
 
-  Labels labels{
+  const Labels labels{
     {"os", "linux"},
     {"version", "0.0.1"},
     {"arch", "x86_64"}

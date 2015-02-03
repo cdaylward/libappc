@@ -20,6 +20,7 @@
 #include <cstdlib> // REM remove when system() hack is removed.
 
 #include "appc/discovery/aci_name.h"
+#include "appc/discovery/https.h"
 #include "appc/discovery/strategy.h"
 #include "appc/util/namespace.h"
 #include "appc/util/status.h"
@@ -78,7 +79,7 @@ private:
 
     virtual Try<URI> fetch(const URI& uri) {
       if (!valid_prefix(https_prefix, uri)) {
-        return Failure<URI>("URI did is not HTTPS, will not fetch " + uri);
+        return Failure<URI>("URI is not HTTPS, will not fetch " + uri);
       }
       // Create directory for app distributor (/<base_path>/example.com)
       // TODO make recursive, make safe.
@@ -91,12 +92,10 @@ private:
       if (stat(storage_dir.c_str(), &dir_stat) != 0) {
         mkdir(storage_dir.c_str(), 0755);
       }
-      // Fetch
-      // TODO obvious hack is obvious.
-      std::string exec{"/usr/bin/curl -f -o "};
-      exec += full_path + " -- " + uri;
-      if (system(exec.c_str()) != 0) {
-        return Failure<URI>("Failed to fetch " + uri);
+
+      Status fetched = https::get(uri, full_path);
+      if (!fetched) {
+        return Failure<URI>(fetched.message);
       }
 
       return Result(file_prefix + full_path);

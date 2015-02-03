@@ -49,6 +49,12 @@ bool valid_prefix(const URI& prefix, const URI& uri) {
   return true;
 }
 
+// TODO make failable.
+Path uri_file_path(const URI& uri) {
+  if (uri.length() > file_prefix.length()) return uri.substr(file_prefix.length());
+  return uri;
+}
+
 
 } // namespace discovery
 } // namespace appc

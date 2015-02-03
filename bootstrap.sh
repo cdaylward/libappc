@@ -2,6 +2,6 @@
 
 set -e
 
-(cd 3rdparty; cmake . && make)
+(cd 3rdparty; cmake -Wno-dev . && make)
 cmake .
 

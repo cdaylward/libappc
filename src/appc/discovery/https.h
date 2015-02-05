@@ -22,6 +22,7 @@
 #include <cstdio>
 #include <curl/curl.h>
 
+#include "3rdparty/cdaylward/pathname.h"
 #include "appc/discovery/types.h"
 #include "appc/util/status.h"
 
@@ -51,6 +52,13 @@ static size_t writer(void* buffer, size_t size, size_t nmemb, void* stream) {
 
 
 Status get(const URI& remote_uri, const Path& write_filename) {
+  // FIXME cleanup
+  const std::string dir = pathname::dir(write_filename);
+  const std::string mkdir = "mkdir -p -- " + dir;
+  if (system(mkdir.c_str())) {
+    return Error(std::string{"Could not create directory "} + dir);
+  }
+
   std::call_once(curl_initialized, []() {
     curl_global_init(CURL_GLOBAL_DEFAULT);
   });

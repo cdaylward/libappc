@@ -41,7 +41,7 @@ const URI file_prefix{"file://"}; // ignoring file://localhost/ for now
 const URI https_prefix{"https://"};
 
 
-bool valid_prefix(const URI& prefix, const URI& uri) {
+inline bool valid_prefix(const URI& prefix, const URI& uri) {
   if (uri.length() <= prefix.length() ||
       uri.compare(0, prefix.length(), prefix) != 0) {
     return false;
@@ -50,7 +50,7 @@ bool valid_prefix(const URI& prefix, const URI& uri) {
 }
 
 // TODO make failable.
-Path uri_file_path(const URI& uri) {
+inline Path uri_file_path(const URI& uri) {
   if (uri.length() > file_prefix.length()) return uri.substr(file_prefix.length());
   return uri;
 }

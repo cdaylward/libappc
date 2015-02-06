@@ -21,18 +21,18 @@
 namespace ns {
 
 
-std::string join(const std::string& separator,
-                 const std::string& first,
-                 const std::string& second) {
+inline std::string join(const std::string& separator,
+                        const std::string& first,
+                        const std::string& second) {
   return first + separator + second;
 }
 
 
 template<typename ...More>
-std::string join(const std::string& separator,
-                 const std::string& first,
-                 const std::string& second,
-                 const More&...more) {
+inline std::string join(const std::string& separator,
+                        const std::string& first,
+                        const std::string& second,
+                        const More&...more) {
   return join(separator, join(separator, first, second), more...);
 }
 

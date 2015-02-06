@@ -27,7 +27,7 @@ namespace discovery {
 
 // Given a name and labels, returns the canonical "common" name for an image.
 // Experimental.
-Try<std::string> render_aci_name(const Name& name, const Labels& labels) {
+inline Try<std::string> render_aci_name(const Name& name, const Labels& labels) {
   auto not_found = labels.end();
   if (labels.find("version") == not_found) return Failure<std::string>("version label required");
   if (labels.find("os") == not_found) return Failure<std::string>("os label required");

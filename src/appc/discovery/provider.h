@@ -53,7 +53,8 @@ public:
         std::cerr << "Fetch failed: " << fetched.failure_reason() << std::endl;
         continue;
       }
-      std::cerr << "Fetched: " << from_result(fetched) << std::endl;
+      std::cerr << "Fetched: " << from_result(uri) << std::endl;
+      std::cerr << "Location: " << from_result(fetched) << std::endl;
       return fetched;
     }
     return Failure<URI>("Could not retrieve " + name);

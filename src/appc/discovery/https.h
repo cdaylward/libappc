@@ -32,7 +32,7 @@ namespace discovery {
 namespace https {
 
 
-std::once_flag curl_initialized;
+static std::once_flag curl_initialized;
 
 
 struct WriteHandle {
@@ -51,7 +51,7 @@ static size_t writer(void* buffer, size_t size, size_t nmemb, void* stream) {
 }
 
 
-Status get(const URI& remote_uri, const Path& write_filename) {
+inline Status get(const URI& remote_uri, const Path& write_filename) {
   // FIXME cleanup
   const std::string dir = pathname::dir(write_filename);
   const std::string mkdir = "mkdir -p -- " + dir;
@@ -69,7 +69,7 @@ Status get(const URI& remote_uri, const Path& write_filename) {
   if (!curl) return Error("Could not initialize curl.");
 
   // FIXME Temporary
-  curl_easy_setopt(curl.get(), CURLOPT_VERBOSE, 1L);
+  //curl_easy_setopt(curl.get(), CURLOPT_VERBOSE, 1L);
   curl_easy_setopt(curl.get(), CURLOPT_URL, remote_uri.c_str());
   curl_easy_setopt(curl.get(), CURLOPT_FAILONERROR, 1L);
 

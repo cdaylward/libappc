@@ -35,27 +35,27 @@ struct Status {
 };
 
 
-Status Valid() {
+inline Status Valid() {
   return Status(true, "");
 }
 
 
-Status Invalid(const std::string& message) {
+inline Status Invalid(const std::string& message) {
   return Status(false, message);
 }
 
 
-Status Success() {
+inline Status Success() {
   return Status(true, "");
 }
 
 
-Status Error(const std::string& message) {
+inline Status Error(const std::string& message) {
   return Status(false, message);
 }
 
 
-Status collect_status(const std::vector<Status>& statuses) {
+inline Status collect_status(const std::vector<Status>& statuses) {
   std::string message{};
   bool successful{true};
   for (auto& status: statuses) {

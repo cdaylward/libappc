@@ -22,6 +22,7 @@
 #include <iostream>
 #include <sys/types.h>
 
+#include "3rdparty/cdaylward/pathname.h"
 #include "appc/util/status.h"
 
 
@@ -30,7 +31,10 @@ namespace os {
 
 
 inline Status mkdir(const std::string& dir, const mode_t mode, const bool create_parents = false) {
-  // FIXME, use syscall
+  if (create_parents && !pathname::is_absolute(dir)) {
+    return Error(std::string{"Will not create parents for relative path: "} + dir);
+  }
+  // FIXME, use syscall, plumb mode
   std::string mkdir_command = "mkdir ";
   if (create_parents) {
     mkdir_command += "-p ";

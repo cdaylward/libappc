@@ -24,6 +24,7 @@
 
 #include "3rdparty/cdaylward/pathname.h"
 #include "appc/discovery/types.h"
+#include "appc/os/mkdir.h"
 #include "appc/util/status.h"
 
 
@@ -52,11 +53,9 @@ static size_t writer(void* buffer, size_t size, size_t nmemb, void* stream) {
 
 
 inline Status get(const URI& remote_uri, const Path& write_filename) {
-  // FIXME cleanup
-  const std::string dir = pathname::dir(write_filename);
-  const std::string mkdir = "mkdir -p -- " + dir;
-  if (system(mkdir.c_str())) {
-    return Error(std::string{"Could not create directory "} + dir);
+  const auto made_image_dir = appc::os::mkdir(pathname::dir(write_filename), 0755, true);
+  if (!made_image_dir) {
+    return Error(std::string{"Could not create directory for image: "} + made_image_dir.message);
   }
 
   std::call_once(curl_initialized, []() {

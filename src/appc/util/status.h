@@ -45,8 +45,8 @@ inline Status Invalid(const std::string& message) {
 }
 
 
-inline Status Success() {
-  return Status(true, "");
+inline Status Success(const std::string message = "") {
+  return Status(true, message);
 }
 
 

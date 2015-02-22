@@ -18,6 +18,7 @@
 #pragma once
 
 #include "appc/schema/common.h"
+#include "appc/schema/ac_name.h"
 
 
 namespace appc {

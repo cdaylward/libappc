@@ -7,8 +7,6 @@ link_directories(${3RDPARTY_USR}/lib)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/examples/image)
 
-set(LIB_ARCHIVE iconv lzma bz2 z xml2 ${3RDPARTY_USR}/lib/libarchive.a)
-
 add_executable(check_image check_image.cpp)
 target_link_libraries(check_image ${LIB_ARCHIVE})
 

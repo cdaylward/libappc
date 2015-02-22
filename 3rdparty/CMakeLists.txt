@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.9)
 include(ExternalProject)
 
 set(3RDPARTY_USR ${CMAKE_CURRENT_LIST_DIR}/usr)
@@ -13,61 +13,19 @@ ExternalProject_add(_get_gtest
   URL https://googletest.googlecode.com/files/gtest-1.7.0.zip
   URL_HASH SHA1=f85f6d2481e2c6c4a18539e391aa4ea8ab0394af
   SOURCE_DIR ${GTEST_DL_DIR}
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND ""
-  INSTALL_COMMAND ""
+  CONFIGURE_COMMAND ./configure --prefix=${3RDPARTY_USR}
+  BUILD_COMMAND make all
   BUILD_IN_SOURCE 1
+  TEST_COMMAND ""
   TEST_BEFORE_INSTALL 0
   TEST_AFTER_INSTALL 0
+  INSTALL_COMMAND ""
   LOG_DOWNLOAD 1
-  LOG_CONFIGURE 0
-  LOG_BUILD 0
+  LOG_CONFIGURE 1
+  LOG_BUILD 1
   LOG_TEST 0
   LOG_INSTALL 0
 )
-
-set(LIBARCHIVE_DIR libarchive-3.1.2)
-ExternalProject_add(_get_libarchive
-  PREFIX ${LIBARCHIVE_DIR}
-  TMP_DIR ./tmp
-  STAMP_DIR ./stamp
-  DOWNLOAD_DIR .
-  URL http://www.libarchive.org/downloads/libarchive-3.1.2.tar.gz
-  URL_HASH SHA1=6a991777ecb0f890be931cec4aec856d1a195489
-  SOURCE_DIR ${LIBARCHIVE_DIR}
-  CONFIGURE_COMMAND ./configure --prefix=${3RDPARTY_USR}
-  BUILD_COMMAND make all
-  BUILD_IN_SOURCE 1
-  TEST_COMMAND ""
-  TEST_BEFORE_INSTALL 0
-  TEST_AFTER_INSTALL 0
-  INSTALL_COMMAND make install
-  LOG_DOWNLOAD 1
-  LOG_CONFIGURE 1
-  LOG_BUILD 1
-  LOG_TEST 1
-  LOG_INSTALL 1
-)
-
-set(LIBCURL_DIR curl-7.40.0)
-ExternalProject_add(_get_libcurl
-  PREFIX ${LIBCURL_DIR}
-  TMP_DIR ./tmp
-  STAMP_DIR ./stamp
-  DOWNLOAD_DIR .
-  URL http://curl.haxx.se/download/curl-7.40.0.tar.gz
-  URL_HASH SHA1=86cc77ddd7814dd417ec807a48dbc60d99a83ddd
-  SOURCE_DIR ${LIBCURL_DIR}
-  CONFIGURE_COMMAND ./configure --prefix=${3RDPARTY_USR}
-  BUILD_COMMAND make all
-  BUILD_IN_SOURCE 1
-  TEST_COMMAND ""
-  TEST_BEFORE_INSTALL 1
-  TEST_AFTER_INSTALL 0
-  INSTALL_COMMAND make install
-  LOG_DOWNLOAD 1
-  LOG_CONFIGURE 1
-  LOG_BUILD 1
-  LOG_TEST 1
-  LOG_INSTALL 1
-)
+ExternalProject_Get_Property(_get_gtest source_dir)
+set(GTEST_ROOT ${source_dir} PARENT_SCOPE)
+set(GTEST_INCLUDE_DIRS ${source_dir}/include PARENT_SCOPE)

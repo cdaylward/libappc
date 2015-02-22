@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "3rdparty/cdaylward/pathname.h"
 #include "appc/schema/common.h"
 
 
@@ -29,8 +30,8 @@ struct Path : StringType<Path> {
   : StringType<Path>(path) {}
 
   Status validate() const {
-    // TODO(cdaylward)
-    return Valid();
+    if (pathname::is_absolute(value)) return Success();
+    return Error(value + " is not absolute.");
   }
 };
 

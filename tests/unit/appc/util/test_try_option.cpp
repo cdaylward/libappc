@@ -1,7 +1,6 @@
-#pragma once
-
 #include <exception>
 
+#include "gtest/gtest.h"
 #include "appc/util/try_option.h"
 
 

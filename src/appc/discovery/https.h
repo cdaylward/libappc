@@ -75,18 +75,6 @@ inline Status get(const URI& remote_uri, const Path& write_filename) {
   char error_buffer[CURL_ERROR_SIZE];
   curl_easy_setopt(curl.get(), CURLOPT_ERRORBUFFER, &error_buffer);
 
-// FIXME plumb this through, cleanup.
-#ifndef __APPLE__
-  const char* pinned_pub_key = getenv("APPC_PINNED_KEY");
-  if (pinned_pub_key != NULL) {
-    std::cerr << "Pinning certificate to " << pinned_pub_key << std::endl;
-    if (curl_easy_setopt(curl.get(), CURLOPT_PINNEDPUBLICKEY, pinned_pub_key) != CURLE_OK) {
-      return Error("Could not pin certificate to APPC_PINNED_KEY");
-    }
-    curl_easy_setopt(curl.get(), CURLOPT_SSL_VERIFYPEER, 0L);
-  }
-#endif
-
   WriteHandle handle{write_filename.c_str(), NULL};
 
   curl_easy_setopt(curl.get(), CURLOPT_WRITEFUNCTION, writer);

@@ -1,10 +1,13 @@
-#pragma once
-
 #include "gtest/gtest.h"
 
 #include "appc/schema/ac_kind.h"
 
 using namespace appc::schema;
+
+
+TEST(AcKind, empty) {
+  ASSERT_FALSE(AcKind::from_json("")->validate());
+}
 
 
 TEST(AcKind, ImageManifest) {

@@ -1,5 +1,3 @@
-#pragma once
-
 #include "gtest/gtest.h"
 
 #include "appc/schema/image.h"

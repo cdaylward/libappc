@@ -37,10 +37,10 @@ struct PortName : ACName<PortName> {
 
 
 struct PortNumber : IntegerType<PortNumber> {
-  explicit PortNumber(const uint16_t port)
+  explicit PortNumber(const uint64_t port)
   : IntegerType<PortNumber>(port) {}
 
-  Status validate() const {
+  virtual Status validate() const {
     if (1 < value && value < 65535) {
       return Valid();
     }
@@ -54,7 +54,6 @@ struct Protocol : StringType<Protocol> {
   : StringType<Protocol>(proto) {}
 
   Status validate() const {
-    // TODO is this true?
     if (value == "tcp" || value == "udp") {
       return Valid();
     }

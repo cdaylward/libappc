@@ -17,7 +17,13 @@
 
 #pragma once
 
+#include <set>
+
+#include "appc/schema/ac_name.h"
 #include "appc/schema/common.h"
+#include "appc/schema/path.h"
+#include "appc/schema/try_json.h"
+#include "appc/util/try_option.h"
 
 
 namespace appc {
@@ -30,16 +36,6 @@ struct MountName : ACName<MountName> {
 };
 
 
-struct MountPath : StringType<MountPath> {
-  explicit MountPath(const std::string& name)
-  : StringType<MountPath>(name) {}
-
-  Status validate() const {
-    return Valid();
-  }
-};
-
-
 struct ReadOnly : BooleanType<ReadOnly> {
   explicit ReadOnly(const bool read_only)
   : BooleanType<ReadOnly>(read_only) {}
@@ -48,11 +44,11 @@ struct ReadOnly : BooleanType<ReadOnly> {
 
 struct MountPoint : Type<MountPoint> {
   const MountName name;
-  const MountPath path;
+  const Path path;
   const Option<ReadOnly> read_only;
 
   explicit MountPoint(const MountName& name,
-                      const MountPath& path,
+                      const Path& path,
                       const Option<ReadOnly>& read_only)
   : name(name),
     path(path),
@@ -60,7 +56,7 @@ struct MountPoint : Type<MountPoint> {
 
   static Try<MountPoint> from_json(const Json& json) {
     const auto name = try_from_json<MountName>(json, "name");
-    const auto path = try_from_json<MountPath>(json, "path");
+    const auto path = try_from_json<Path>(json, "path");
     const auto read_only = try_option_from_json<ReadOnly>(json, "readOnly");
     if (!all_results(name, path, read_only)) {
       return collect_failure_reasons<MountPoint>(name, path, read_only);
@@ -70,9 +66,9 @@ struct MountPoint : Type<MountPoint> {
                              from_result(read_only)));
   }
 
-  Status validate() const {
-    // TODO(cdaylward)
-    return Valid();
+  virtual Status validate() const {
+    return collect_status({name.validate(),
+                           path.validate()});
   }
 };
 
@@ -80,6 +76,21 @@ struct MountPoint : Type<MountPoint> {
 struct MountPoints : ArrayType<MountPoints, MountPoint> {
   explicit MountPoints(const std::vector<MountPoint>& args)
   : ArrayType<MountPoints, MountPoint>(args) {}
+
+  virtual Status validate() const {
+    std::set<std::string> seen;
+    for (const auto& mount_point : this->array) {
+      if (seen.find(mount_point.name) != seen.end()) {
+        return Invalid(std::string{"mountPoints has duplicate definition "} + mount_point.name.value);
+      }
+      seen.emplace(mount_point.name.value);
+      auto valid = mount_point.validate();
+      if (!valid) {
+        return valid;
+      }
+    }
+    return Valid();
+  }
 };
 
 

@@ -62,7 +62,8 @@ struct EventHandler : Type<EventHandler> {
   }
 
   Status validate() const {
-    return name.validate();
+    return collect_status({name.validate(),
+                           exec.validate()});
   }
 };
 
@@ -85,6 +86,7 @@ struct EventHandlers : ArrayType<EventHandlers, EventHandler> {
       if (seen.find(handler.name) != seen.end()) {
         return Invalid(std::string{"event_handlers has duplicate definition "} + handler.name.value);
       }
+      seen.emplace(handler.name);
       auto valid = handler.validate();
       if (!valid) {
         return valid;

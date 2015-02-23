@@ -24,13 +24,13 @@ TEST(Try, failure_has_reason) {
 
 TEST(Try, result_is_shared_ptr) {
   auto a_try = Result(std::string{"result"});
-  std::shared_ptr<std::string> ptr { a_try };
+  std::shared_ptr<std::string> ptr = a_try;
   ASSERT_EQ(2, ptr.use_count());
 }
 
 TEST(Try, result_derefences) {
   auto a_try = Result(std::string{"result"});
-  std::shared_ptr<std::string> ptr { a_try };
+  std::shared_ptr<std::string> ptr = a_try;
   ASSERT_EQ(typeid(std::string), typeid(*a_try));
   ASSERT_EQ(typeid(std::string), typeid(from_result(a_try)));
   ASSERT_EQ(std::string{"result"}, *a_try);

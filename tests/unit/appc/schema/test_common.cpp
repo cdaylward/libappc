@@ -22,7 +22,7 @@ TEST(Status, collect_status) {
   ASSERT_EQ(std::string{"\"one\", \"two\""}, invalid.message);
 }
 
-struct SomeStringType : StringType<SomeStringType> {
+struct SomeStringType : public StringType<SomeStringType> {
   explicit SomeStringType(const std::string& val)
   : StringType<SomeStringType>(val) {}
   Status validate() const {
@@ -31,7 +31,7 @@ struct SomeStringType : StringType<SomeStringType> {
 };
 
 TEST(StringType, is_implicit_string) {
-  std::string some_string { SomeStringType("a string") };
+  std::string some_string = SomeStringType("a string");
   ASSERT_EQ("a string", some_string);
 }
 

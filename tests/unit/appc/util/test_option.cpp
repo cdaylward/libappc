@@ -9,13 +9,13 @@ TEST(Option, none_is_false) {
 }
 
 TEST(Option, some_is_true) {
-  auto some = Some(std::string(""));
+  auto some = Some(std::string{""});
   ASSERT_TRUE(some);
 }
 
 TEST(Option, some_is_shared_ptr) {
   auto some = Some(std::string(""));
-  std::shared_ptr<std::string> ptr { some };
+  std::shared_ptr<std::string> ptr = some;
   ASSERT_EQ(2, ptr.use_count());
 }
 

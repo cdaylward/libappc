@@ -1,5 +1,7 @@
 # libappc
 
+[![Build Status](https://travis-ci.org/cdaylward/libappc.svg?branch=master)](https://travis-ci.org/cdaylward/libappc)
+
 ## Overview
 
 A C++ library for working with [App Containers](https://github.com/appc/spec). The goal of the

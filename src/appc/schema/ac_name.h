@@ -39,7 +39,7 @@ struct ACName : StringType<T> {
       return Invalid("ACName must not be empty.");
     }
     if (this->value.size() > max_ac_name_length) {
-      return Invalid("ACName must not be longer than " + max_ac_name_length);
+      return Invalid("ACName must not be longer than " + std::to_string(max_ac_name_length));
     }
     const std::regex pattern("^[A-Za-z0-9]+([-./][A-Za-z0-9]+)*$",
                              std::regex::ECMAScript);

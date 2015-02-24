@@ -28,8 +28,17 @@ struct User : StringType<User> {
   explicit User(const std::string& uid)
   : StringType<User>(uid) {}
 
-  Status validate() const {
-    //TODO(cdaylward)
+  virtual Status validate() const {
+    auto is_int = TryFrom<int>([&]() {
+        return std::stoi(value);
+    });
+    if (!is_int) {
+      return Invalid("user must be an integer");
+    }
+    // Check inverse because std::stoi can consume a partial.
+    if (std::to_string(from_result(is_int)) != value) {
+      return Invalid("user must be an integer");
+    }
     return Valid();
   }
 };

@@ -37,7 +37,16 @@ struct Annotation : NameValueType<Annotation> {
   : NameValueType<Annotation>(name, value) {}
 
   Status validate() const {
-    return AnnotationName(name).validate();
+    if (!AnnotationName(name).validate()) {
+      return Invalid("Annotation name must be an AC Name type.");
+    }
+    if (name == "homepage" || name == "documentation") {
+      if (value.find("http://") != 0 &&
+          value.find("https://") != 0) {
+        return Invalid("homepage and documentation must be HTTP or HTTPS URLs");
+      }
+    }
+    return Valid();
   }
 };
 

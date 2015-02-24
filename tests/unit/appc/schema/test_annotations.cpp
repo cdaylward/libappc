@@ -60,3 +60,22 @@ TEST(Annotations, non_acname_element_is_invalid) {
   auto result = Annotations::from_json(json);
   ASSERT_FALSE(result->validate());
 }
+
+TEST(Annotations, homepage_must_be_http) {
+  const Json json = {
+    {
+      {"name", "homepage"},
+      {"value", "http://github.com/cdaylward/libappc"}
+    }
+  };
+  auto result = Annotations::from_json(json);
+  ASSERT_TRUE(result->validate());
+  const Json bad_json = {
+    {
+      {"name", "homepage"},
+      {"value", "github.com/cdaylward/libappc"}
+    }
+  };
+  auto bad_result = Annotations::from_json(bad_json);
+  ASSERT_FALSE(bad_result->validate());
+}

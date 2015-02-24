@@ -32,7 +32,7 @@ class Try {
   : result(std::move(result)),
     reason(reason) {}
 
-  explicit Try<T>(std::nullptr_t null,
+  explicit Try<T>(std::nullptr_t,
                   const std::string& reason)
   : reason(reason) {}
 

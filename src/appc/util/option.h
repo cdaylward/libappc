@@ -29,7 +29,7 @@ class Option {
   explicit Option<T>(const std::shared_ptr<T>& ptr)
   : ptr(ptr) {}
 
-  explicit Option<T>(std::nullptr_t null) : ptr{nullptr} {}
+  explicit Option<T>(std::nullptr_t) : ptr{nullptr} {}
 
   operator bool() const {
     return static_cast<bool>(ptr);

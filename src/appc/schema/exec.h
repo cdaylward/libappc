@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "3rdparty/cdaylward/pathname.h"
+
 #include "appc/schema/common.h"
 
 
@@ -28,8 +30,7 @@ struct ExecArg : StringType<ExecArg> {
   explicit ExecArg(const std::string& arg)
   : StringType<ExecArg>(arg) {}
 
-  Status validate() const {
-    // TODO(cdaylward)
+  virtual Status validate() const {
     return Valid();
   }
 };
@@ -38,6 +39,16 @@ struct ExecArg : StringType<ExecArg> {
 struct Exec : ArrayType<Exec, ExecArg> {
   explicit Exec(const std::vector<ExecArg>& args)
   : ArrayType<Exec, ExecArg>(args) {}
+
+  virtual Status validate() const {
+    if (array.empty()) {
+      return Error("exec must not be empty.");
+    }
+    if (!pathname::is_absolute(array.front())) {
+      return Error("The executable in exec must use absolute path.");
+    }
+    return Valid();
+  }
 };
 
 

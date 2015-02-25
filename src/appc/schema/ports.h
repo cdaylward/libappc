@@ -37,7 +37,7 @@ struct PortName : ACName<PortName> {
 
 
 struct PortNumber : IntegerType<PortNumber> {
-  explicit PortNumber(const uint64_t port)
+  explicit PortNumber(const int64_t port)
   : IntegerType<PortNumber>(port) {}
 
   virtual Status validate() const {

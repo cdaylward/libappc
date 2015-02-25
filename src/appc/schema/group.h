@@ -27,20 +27,13 @@ namespace appc {
 namespace schema {
 
 
-struct Group : StringType<Group> {
-  explicit Group(const std::string& gid)
-  : StringType<Group>(gid) {}
+struct Group : IntegerType<Group> {
+  explicit Group(const int64_t& gid)
+  : IntegerType<Group>(gid) {}
 
   virtual Status validate() const {
-    auto is_int = TryFrom<int>([&]() {
-        return std::stoi(value);
-    });
-    if (!is_int) {
-      return Invalid("group must be an integer");
-    }
-    // Check inverse because std::stoi can consume a partial.
-    if (std::to_string(from_result(is_int)) != value) {
-      return Invalid("group must be an integer");
+    if (value < INT32_MIN || value > INT32_MAX) {
+      return Invalid("Group must be 32 bit integer.");
     }
     return Valid();
   }

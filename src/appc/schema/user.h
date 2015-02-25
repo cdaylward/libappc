@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "appc/schema/common.h"
 
 
@@ -24,20 +26,13 @@ namespace appc {
 namespace schema {
 
 
-struct User : StringType<User> {
-  explicit User(const std::string& uid)
-  : StringType<User>(uid) {}
+struct User : IntegerType<User> {
+  explicit User(const int64_t& uid)
+  : IntegerType<User>(uid) {}
 
   virtual Status validate() const {
-    auto is_int = TryFrom<int>([&]() {
-        return std::stoi(value);
-    });
-    if (!is_int) {
-      return Invalid("user must be an integer");
-    }
-    // Check inverse because std::stoi can consume a partial.
-    if (std::to_string(from_result(is_int)) != value) {
-      return Invalid("user must be an integer");
+    if (INT32_MIN > value || value > INT32_MAX) {
+      return Invalid("User must be 32 bit integer.");
     }
     return Valid();
   }

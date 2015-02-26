@@ -47,14 +47,14 @@ public:
         continue;
       }
       // TODO logging, ;)
-      //std::cerr << "Resolved: " << name << " -> " << from_result(uri) << std::endl;
+      std::cerr << "Resolved: " << name << " -> " << from_result(uri) << std::endl;
       auto fetched = strategy.get_fetcher()->fetch(from_result(uri));
       if (!fetched) {
-        //std::cerr << "Fetch failed: " << fetched.failure_reason() << std::endl;
+        std::cerr << "Fetch failed: " << fetched.failure_reason() << std::endl;
         continue;
       }
-      //std::cerr << "Fetched: " << from_result(uri) << std::endl;
-      //std::cerr << "Location: " << from_result(fetched) << std::endl;
+      std::cerr << "Fetched: " << from_result(uri) << std::endl;
+      std::cerr << "Stored: " << from_result(fetched) << std::endl;
       return fetched;
     }
     return Failure<URI>("Could not retrieve " + name);

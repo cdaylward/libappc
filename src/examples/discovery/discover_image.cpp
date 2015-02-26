@@ -22,8 +22,8 @@ int main(int args, char** argv) {
 
   const Labels labels{
     {"os", "linux"},
-    {"version", "0.0.1"},
-    {"arch", "x86_64"}
+    {"version", "1.0.0"},
+    {"arch", "amd64"}
   };
 
   // By configuring the local strategy and the simple strategy with the same

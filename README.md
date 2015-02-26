@@ -13,7 +13,7 @@ the headers you require.
 
 ## Getting Started
 
-Requires functional std::regex (If using gcc, >= 4.9)
+Requires libarchive, libcurl, and functional std::regex (If using gcc, >= 4.9)
 
 1. Bootstrap it (download and build dependencies): `./bootstrap.sh`
 2. Run the tests: `./test.sh`
@@ -21,7 +21,7 @@ Requires functional std::regex (If using gcc, >= 4.9)
 
 ## Status
 
-Early, early (like really early) development. Most pieces are incomplete and require tests, build
+Early, early (like really early) development. Many pieces are incomplete and require tests, build
 scripts need work, use of syntax likely inconsistent, etc.
 
 Components that exist in some form:
@@ -36,14 +36,7 @@ bin/examples, e.g.
 
 ```
 $ ./build.sh
-[ 34%] Built target _get_gtest
-[ 69%] Built target _get_libarchive
-[ 73%] Built target gtest
-[ 78%] Built target gtest_main
-[ 82%] Built target discover_image
-[ 86%] Built target generate_complete_crm
-[ 91%] Built target generate_minimal_crm
-[ 95%] Built target parse
+--- 8< ---
 [100%] Built target validate
 
 $ ./bin/examples/schema/generate_complete_crm > /tmp/container.json
@@ -59,13 +52,12 @@ UUID: 0F426158-97EE-49F8-B4A3-792ECDA926FB
 $ ./bin/examples/schema/validate image_bad.json
 Invalid Manifest: "imageID must be <hash name>-<hex representation> format"
 
-$ ./bin/examples/discovery/discover_image
-Resolved: example.com/worker -> file:///tmp/images/example.com/worker-0.0.1-linux-x86_64.aci
-Fetch failed: file:///tmp/images/example.com/worker-0.0.1-linux-x86_64.aci No such file or directory
-Resolved: example.com/worker -> https://example.com/worker-0.0.1-linux-x86_64.aci
-The requested URL returned error: 404 Not Found
-Fetch failed: Failed to fetch https://example.com/worker-0.0.1-linux-x86_64.aci
-Failed to retrieve image for example.com/worker
+$ ./bin/examples/discovery/discover_image nosecone.net/example/test 
+Resolved: nosecone.net/example/test -> file:///tmp/images/nosecone.net/example/test-1.0.0-linux-amd64.aci
+Fetch failed: file:///tmp/images/nosecone.net/example/test-1.0.0-linux-amd64.aci No such file or directory
+Resolved: nosecone.net/example/test -> https://nosecone.net/example/test-1.0.0-linux-amd64.aci
+Fetched: https://nosecone.net/example/test-1.0.0-linux-amd64.aci
+Stored: file:///tmp/images/nosecone.net/example/test-1.0.0-linux-amd64.aci
 ```
 
 ## Contributing

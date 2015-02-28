@@ -17,11 +17,10 @@
 
 #pragma once
 
-#include <cstdlib> // REM remove when system() hack is removed.
-
 #include "appc/discovery/aci_name.h"
 #include "appc/discovery/https.h"
 #include "appc/discovery/strategy.h"
+#include "appc/os/mkdir.h"
 #include "appc/util/namespace.h"
 #include "appc/util/status.h"
 #include "appc/util/try.h"
@@ -82,7 +81,6 @@ private:
         return Failure<URI>("URI is not HTTPS, will not fetch " + uri);
       }
       // Create directory for app distributor (/<base_path>/example.com)
-      // TODO make recursive, make safe.
       const Path full_path = pathname::join(base_path, uri.substr(https_prefix.length()));
       const Path storage_dir = pathname::dir(full_path);
       if (!pathname::is_absolute(storage_dir) || pathname::has_dot_dot(storage_dir)) {
@@ -90,7 +88,8 @@ private:
       }
       struct stat dir_stat;
       if (stat(storage_dir.c_str(), &dir_stat) != 0) {
-        mkdir(storage_dir.c_str(), 0755);
+        auto made_dir = os::mkdir(storage_dir, 0755, true);
+        if (!made_dir) return Failure<URI>(made_dir.message);
       }
 
       Status fetched = https::get(uri, full_path);

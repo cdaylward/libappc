@@ -19,6 +19,7 @@
 
 #include "appc/schema/common.h"
 #include "appc/schema/mount_points.h"
+#include "appc/schema/path.h"
 #include "appc/schema/try_json.h"
 
 
@@ -51,14 +52,12 @@ struct MountPointNames : ArrayType<MountPointNames, MountPointName> {
 };
 
 
-// TODO this should be a Path type
 struct VolumeSource : StringType<VolumeSource> {
   explicit VolumeSource(const std::string& path)
   : StringType<VolumeSource>(path) {}
 
   Status validate() const {
-    // TODO
-    return Valid();
+    return Path(value).validate();
   }
 };
 

@@ -36,7 +36,7 @@ struct EventName : ACName<EventName> {
 
   bool operator<(const EventName& rhs) const {
     return value < rhs.value;
-  };
+  }
 };
 
 

@@ -38,13 +38,13 @@ const std::string rootfs_filename{"rootfs"};
 // Work in progress, experimental, no API here yet.
 
 
-static int copy_data(struct archive* in, struct archive* out) {
+static ssize_t copy_data(struct archive* in, struct archive* out) {
   const void* buff;
   size_t size;
   off_t offset;
 
   for (;;) {
-    int r = archive_read_data_block(in, &buff, &size, &offset);
+    ssize_t r = archive_read_data_block(in, &buff, &size, &offset);
     if (r == ARCHIVE_EOF) return ARCHIVE_OK;
     if (r < ARCHIVE_OK) return r;
     r = archive_write_data_block(out, buff, size, offset);

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(libappc CXX)
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -Weverything -pedantic -Wno-unused-parameter -Wno-c++98-compat -Wno-exit-time-destructors -Wno-padded -Wno-global-constructors -Wno-weak-vtables -Wno-shadow -Wno-deprecated")
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -pedantic")
 set(CMAKE_CXX_FLAGS_DISTRIBUTION "-O3")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

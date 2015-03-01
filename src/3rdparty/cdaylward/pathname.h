@@ -19,7 +19,6 @@
 
 #include <string>
 #include <vector>
-#include <sys/stat.h>
 
 
 namespace pathname {
@@ -52,6 +51,37 @@ inline std::string join(const std::string& first, const std::string& second) {
 template<typename ...Path>
 inline std::string join(const std::string& first, const std::string& second, const Path&... rest) {
   return join(join(first, second), rest...);
+}
+
+
+inline std::string join(const std::vector<std::string>& entries) {
+  if (entries.empty()) return "";
+  if (entries.size() == 1) return entries[0];
+  if (entries.size() == 2) return join(entries[0], entries[1]);
+  std::vector<std::string> next{join(entries[0], entries[1])};
+  next.insert(next.end(), entries.begin() + 2, entries.end());
+  return join(next);
+}
+
+
+inline std::vector<std::string> split(const std::string& path) {
+  if (path == "/") return { path };
+  std::vector<std::string> entries;
+  size_t last = 0;
+  size_t next = 0;
+  std::string trimmed = trim_trailing_slash(path);
+  if (trimmed.empty()) return { "/" };
+  for (auto c : trimmed) {
+    next++;
+    if (c == separator) {
+      if (next == 1) entries.push_back("/");
+      else entries.push_back(trimmed.substr(last, next - last - 1));
+      last = next;
+    }
+  }
+  entries.push_back(trimmed.substr(last));
+
+  return entries;
 }
 
 

@@ -18,9 +18,5 @@ matures.
 
 ## TODO
 
-- [x] from_json(...) for all types in the image manifest tree
-- [x] from_json(...) for all types in the container runtime manifest tree
-- [ ] to_json(...) for all types in the image manifest tree
-- [x] to_json(...) for all types in the container runtime manifest tree
 - [ ] spec-compliant validate() for all types
 - [ ] breadcrumbs in error messages ("container/volumes: error text")

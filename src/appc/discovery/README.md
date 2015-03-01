@@ -2,13 +2,15 @@
 
 ## Overview
 
-Discovery is structured as a set of strategies (e.g. the two from the App Container specification
-are Simple, and Meta). Each strategy has a resolver and a fetcher. A resolver takes an app name +
-labels and returns a URI where the image is located. A fetcher takes a URI, performs the necessary
-action to retrieve the image, stores it, and returns a URI of its on-disk location. Strategies can
-be mixed-and-matched or chained together by providing them to an image provider which wraps
-iterating through the strategies. An image provider returns the on-disk URI for an image provided by
-the first strategy that won.
+Discovery is structured as a set of strategies (e.g. the two from the App
+Container specification are Simple, and Meta). Each strategy has a resolver
+and a fetcher. A resolver takes an app name + labels and returns a URI where
+the image is located. A fetcher takes a URI, performs the necessary action to
+retrieve the image, stores it, and returns a URI of its on-disk location.
+Strategies can be mixed-and-matched or chained together by providing them to
+an image provider which wraps iterating through the strategies. An image
+provider returns the on-disk URI for an image provided by the first strategy
+that won.
 
 ## Example Use
 
@@ -17,8 +19,8 @@ Name name{"example.com/worker"};
 
 Labels labels{
   {"os", "linux"},
-  {"version", "0.0.1"},
-  {"arch", "x86_64"}
+  {"version", "1.0.0"},
+  {"arch", "amd64"}
 };
 
 // By configuring the local strategy and the simple strategy with the same

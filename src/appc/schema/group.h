@@ -27,14 +27,12 @@ namespace appc {
 namespace schema {
 
 
-struct Group : IntegerType<Group> {
-  explicit Group(const int64_t& gid)
-  : IntegerType<Group>(gid) {}
+struct Group : StringType<Group> {
+  explicit Group(const std::string& gid)
+  : StringType<Group>(gid) {}
 
   virtual Status validate() const {
-    if (value < INT32_MIN || value > INT32_MAX) {
-      return Invalid("Group must be 32 bit integer.");
-    }
+    if (value.empty()) return Invalid("group, if specified, cannot be empty.");
     return Valid();
   }
 };

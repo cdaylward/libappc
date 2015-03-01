@@ -26,14 +26,12 @@ namespace appc {
 namespace schema {
 
 
-struct User : IntegerType<User> {
-  explicit User(const int64_t& uid)
-  : IntegerType<User>(uid) {}
+struct User : StringType<User> {
+  explicit User(const std::string& uid)
+  : StringType<User>(uid) {}
 
   virtual Status validate() const {
-    if (INT32_MIN > value || value > INT32_MAX) {
-      return Invalid("User must be 32 bit integer.");
-    }
+    if (value.empty()) return Invalid("user, if specified, cannot be empty.");
     return Valid();
   }
 };

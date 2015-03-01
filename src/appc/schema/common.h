@@ -126,7 +126,7 @@ template<typename T>
 struct BooleanType : Type<T> {
   const bool value;
 
-  explicit BooleanType<T>(const double value)
+  explicit BooleanType<T>(const bool value)
   : value(value) {}
 
   bool operator==(const BooleanType<T>& other) const {

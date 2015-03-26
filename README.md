@@ -1,6 +1,7 @@
 # libappc
 
 [![Build Status](https://travis-ci.org/cdaylward/libappc.svg?branch=master)](https://travis-ci.org/cdaylward/libappc)
+[![Build Status](https://webapi.biicode.com/v1/badges/manu343726/manu343726/libappc/master)](https://www.biicode.com/manu343726/libappc) 
 
 ## Overview
 
@@ -18,6 +19,11 @@ Requires libarchive, libcurl, and functional std::regex (If using gcc, >= 4.9)
 1. Bootstrap it (download and build dependencies): `./bootstrap.sh`
 2. Run the tests: `./test.sh`
 3. Build the examples: `./build.sh`
+
+### With [biicode](https://www.biicode.com)
+
+1. Run `bii buzz` command
+2. Run examples on `bin/` directory
 
 ## Status
 
